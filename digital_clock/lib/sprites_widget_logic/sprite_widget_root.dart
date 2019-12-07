@@ -4,15 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
 import 'package:spritewidget/spritewidget.dart';
 
+import './boid.dart';
+
 class SpriteWidgetRoot extends NodeWithSize {
   DateTime _dateTime = DateTime.now();
   ClockModel _clockModel;
 
+  List<Boid> _boids = List<Boid>();
+
   SpriteWidgetRoot({ClockModel clockModel}) : super(const Size(500, 300)) {
     _clockModel = clockModel;
+    for (int i = 0; i < 100; i++) {
+      _boids.add(Boid(size));
+    }
   }
-
-  double x = 0;
 
   void setTime(DateTime time) => _dateTime = time;
 
@@ -20,12 +25,16 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(double dt) {
-    x += dt * 50;
+    for (Boid boid in _boids) {
+      boid.flock(_boids);
+      boid.update(dt);
+    }
   }
 
   @override
   void paint(Canvas canvas) {
-    super.paint(canvas);
-    canvas.drawCircle(Offset(x, 100), 10, Paint()..color = Colors.red);
+    for (Boid boid in _boids) {
+      boid.paint(canvas);
+    }
   }
 }
