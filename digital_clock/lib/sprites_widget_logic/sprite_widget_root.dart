@@ -7,6 +7,10 @@ import 'package:spritewidget/spritewidget.dart';
 import './boid.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
+  //TODO: implement quadTree https://youtu.be/OJxEcs0w_kE
+  //TODO: add steering toward part of number
+  //TODO: make it fancy with triangles
+
   DateTime _dateTime = DateTime.now();
   ClockModel _clockModel;
 
@@ -14,7 +18,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   SpriteWidgetRoot({ClockModel clockModel}) : super(const Size(500, 300)) {
     _clockModel = clockModel;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 500; i++) {
       _boids.add(Boid(size));
     }
   }

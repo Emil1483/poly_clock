@@ -4,17 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
 class Boid {
-  static const double observeRadius = 50;
+  static const double observeRadius = 20;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
-  static const double alignmentForce = 1;
-  static const double alignmentSpeed = 70;
+  static const double speed = 100;
 
-  static const double padding = 5;
+  static const double alignmentForce = 1;
+  static const double cohesionForce = 1;
+  static const double separationForce = 1;
+
+  static const double padding = 2;
 
   Size canvasSize;
   Vector2 pos;
   Vector2 vel;
+  Vector2 acc;
 
   Boid(Size size) {
     canvasSize = size;
@@ -29,6 +33,8 @@ class Boid {
       r.nextDouble() - 0.5,
     );
     vel.scale(50);
+
+    acc = Vector2.zero();
   }
 
   void edges() {
@@ -38,36 +44,109 @@ class Boid {
     if (pos.y > canvasSize.height + padding) pos.y = -padding;
   }
 
-  void flock(List<Boid> boids) {
-    int total = 0;
-    Vector2 steering = Vector2.zero();
-    for (Boid other in boids) {
-      if (pos.distanceToSquared(other.pos) > observeRadiusSq) continue;
-      steering.add(other.vel);
-      total++;
-    }
-    //steering.scale(1/total);
-    steering.normalize();
-    steering.scale(alignmentSpeed);
-    steering.sub(vel);
-    if (steering.length > alignmentForce) {
+  void steer({
+    @required Vector2 Function() getDesired,
+    @required double maxForce,
+  }) {
+    Vector2 desired = getDesired();
+    desired.normalize();
+    desired.scale(speed);
+    Vector2 steering = desired - vel;
+    if (steering.length > maxForce) {
       steering.normalize();
-      steering.scale(alignmentForce);
+      steering.scale(maxForce);
     }
     applyForce(steering);
   }
 
+  void alignment(List<Boid> boids) {
+    steer(
+      maxForce: alignmentForce,
+      getDesired: () {
+        Vector2 desired = Vector2.zero();
+        int total = 0;
+        for (Boid other in boids) {
+          if (other == this) continue;
+          if (pos.distanceToSquared(other.pos) > observeRadiusSq) continue;
+          desired.add(other.vel);
+          total++;
+        }
+        if (total == 0) return Vector2.copy(vel);
+        return desired;
+      },
+    );
+  }
+
+  void cohesion(List<Boid> boids) {
+    steer(
+      maxForce: cohesionForce,
+      getDesired: () {
+        Vector2 desired = Vector2.zero();
+        int total = 0;
+        for (Boid other in boids) {
+          if (other == this) continue;
+          if (pos.distanceToSquared(other.pos) > observeRadiusSq) continue;
+          desired.add(other.pos);
+          total++;
+        }
+        if (total == 0) return Vector2.copy(vel);
+        desired.scale(1 / total);
+        desired.sub(pos);
+        return desired;
+      },
+    );
+  }
+
+  void spearation(List<Boid> boids) {
+    steer(
+        maxForce: separationForce,
+        getDesired: () {
+          Vector2 desired = Vector2.zero();
+          int total = 0;
+          for (Boid other in boids) {
+            if (other == this) continue;
+            final dist = pos.distanceTo(other.pos);
+            if (dist > observeRadius) continue;
+            desired.add((pos - other.pos) / dist);
+            total++;
+          }
+          if (total == 0) return Vector2.copy(vel);
+
+          return desired;
+        });
+  }
+
+  void flock(List<Boid> boids) {
+    alignment(boids);
+    cohesion(boids);
+    spearation(boids);
+  }
+
   void applyForce(Vector2 force) {
-    vel.add(force);
+    acc.add(force);
   }
 
   void update(double dt) {
     edges();
+    vel.add(acc);
     pos.add(vel * dt);
+
+    acc.setZero();
   }
 
   void paint(Canvas canvas) {
     canvas.drawCircle(
-        Offset(pos.x, pos.y), padding, Paint()..color = Color(0xFF000000));
+      Offset(pos.x, pos.y),
+      padding,
+      Paint()..color = Color(0xFF000000),
+    );
+    return;
+    canvas.drawCircle(
+      Offset(pos.x, pos.y),
+      observeRadius,
+      Paint()
+        ..color = Color(0x35000000)
+        ..style = PaintingStyle.stroke,
+    );
   }
 }
