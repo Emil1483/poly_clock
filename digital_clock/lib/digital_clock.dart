@@ -4,7 +4,7 @@ import 'package:flutter_clock_helper/model.dart';
 import 'package:flutter/material.dart';
 import 'package:spritewidget/spritewidget.dart';
 
-import './sprite_widget_root.dart';
+import './sprites_widget_logic/sprite_widget_root.dart';
 
 class DigitalClock extends StatefulWidget {
   const DigitalClock(this.model);
