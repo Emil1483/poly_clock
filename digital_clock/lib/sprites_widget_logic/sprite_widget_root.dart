@@ -9,7 +9,6 @@ import './boid.dart';
 import './quad_tree.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: implement quadTree https://youtu.be/OJxEcs0w_kE
   //TODO: add steering toward part of number
   //TODO: make it fancy with triangles
 
