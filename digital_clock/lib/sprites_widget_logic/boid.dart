@@ -32,7 +32,6 @@ class Boid{
       r.nextDouble() - 0.5,
       r.nextDouble() - 0.5,
     );
-    //vel.scale(speed);
 
     acc = Vector2.zero();
   }
