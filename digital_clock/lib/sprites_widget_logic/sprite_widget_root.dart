@@ -22,7 +22,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 350; i++) {
       boids.add(Boid(size));
     }
   }
