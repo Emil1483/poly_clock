@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
 class Boid{
-  static const double observeRadius = 30;
+  static const double observeRadius = 12;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
   static const double speed = 2.2;
 
   static const double alignmentForce = 0.5;
-  static const double cohesionForce = 0.45;
-  static const double separationForce = 0.55;
+  static const double cohesionForce = 0.5;
+  static const double separationForce = 0.6;
 
   static const double padding = 2;
 
