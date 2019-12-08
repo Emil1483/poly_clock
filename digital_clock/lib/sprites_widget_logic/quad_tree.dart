@@ -6,6 +6,7 @@ import 'package:vector_math/vector_math.dart';
 class Point {
   final Vector2 pos;
   final Object data;
+
   Point({
     @required this.pos,
     @required this.data,

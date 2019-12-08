@@ -3,17 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
-import './quad_tree.dart';
-
-class Boid {
+class Boid{
   static const double observeRadius = 20;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
-  static const double speed = 100;
+  static const double speed = 3;
 
-  static const double alignmentForce = 1;
-  static const double cohesionForce = 1;
-  static const double separationForce = 1;
+  static const double alignmentForce = 0.6;
+  static const double cohesionForce = 0.6;
+  static const double separationForce = 0.7;
 
   static const double padding = 2;
 
@@ -69,7 +67,6 @@ class Boid {
         int total = 0;
         for (Boid other in boids) {
           if (other == this) continue;
-          if (pos.distanceToSquared(other.pos) > observeRadiusSq) continue;
           desired.add(other.vel);
           total++;
         }
@@ -87,7 +84,6 @@ class Boid {
         int total = 0;
         for (Boid other in boids) {
           if (other == this) continue;
-          if (pos.distanceToSquared(other.pos) > observeRadiusSq) continue;
           desired.add(other.pos);
           total++;
         }
@@ -108,7 +104,6 @@ class Boid {
           for (Boid other in boids) {
             if (other == this) continue;
             final dist = pos.distanceTo(other.pos);
-            if (dist > observeRadius) continue;
             desired.add((pos - other.pos) / dist);
             total++;
           }
@@ -128,10 +123,10 @@ class Boid {
     acc.add(force);
   }
 
-  void update(double dt) {
+  void update() {
     edges();
     vel.add(acc);
-    pos.add(vel * dt);
+    pos.add(vel);
 
     acc.setZero();
   }
@@ -141,14 +136,6 @@ class Boid {
       Offset(pos.x, pos.y),
       padding,
       Paint()..color = Color(0xFF000000),
-    );
-    return;
-    canvas.drawCircle(
-      Offset(pos.x, pos.y),
-      observeRadius,
-      Paint()
-        ..color = Color(0x35000000)
-        ..style = PaintingStyle.stroke,
     );
   }
 }

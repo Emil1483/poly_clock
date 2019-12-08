@@ -22,7 +22,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 200; i++) {
       boids.add(Boid(size));
     }
   }
@@ -32,7 +32,7 @@ class SpriteWidgetRoot extends NodeWithSize {
   void updateModel(ClockModel model) => clockModel = model;
 
   @override
-  void update(double dt) {
+  void update(_) {
     qTree = QuadTree(
       pos: Vector2(size.width / 2, size.height / 2),
       w: size.width,
@@ -45,8 +45,10 @@ class SpriteWidgetRoot extends NodeWithSize {
       );
     }
     for (Boid boid in boids) {
-      boid.flock(boids);
-      boid.update(dt);
+      List<Point> data = qTree.circleQuery(boid.pos, Boid.observeRadius);
+      List<Boid> others = data.map((Point p) => p.data as Boid).toList();
+      boid.flock(others);
+      boid.update();
     }
   }
 
@@ -55,35 +57,5 @@ class SpriteWidgetRoot extends NodeWithSize {
     for (Boid boid in boids) {
       boid.paint(canvas);
     }
-    if (qTree == null) return;
-    qTree.paint(canvas);
-    canvas.drawCircle(
-      Offset(100, 100),
-      50,
-      Paint()
-        ..color = Color(0xFF00FF00)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 5,
-    );
-    List<Point> found = qTree.circleQuery(Vector2(100, 100), 50);
-    for (Point p in found) {
-      canvas.drawCircle(
-        Offset(p.pos.x, p.pos.y),
-        5,
-        Paint()..color = Color(0xFF00FF00),
-      );
-    }
   }
-
-/*
-    List<Point> found = qTree.query(Vector2(114, 220), 200, 100);
-    for (Point p in found) {
-      canvas.drawCircle(
-        Offset(p.pos.x, p.pos.y),
-        10,
-        Paint()..color = Color(0xFF0000FF),
-      );
-    }
-  }
-  */
 }
