@@ -22,7 +22,7 @@ class _DigitalClockState extends State<DigitalClock> {
   @override
   void initState() {
     super.initState();
-    _rootWidget = SpriteWidgetRoot(clockModel: widget.model);
+    _rootWidget = SpriteWidgetRoot(model: widget.model);
     widget.model.addListener(_updateModel);
     _updateTime();
     _updateModel();

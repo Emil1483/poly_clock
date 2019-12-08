@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
+import './quad_tree.dart';
+
 class Boid {
   static const double observeRadius = 20;
   static const double observeRadiusSq = observeRadius * observeRadius;
