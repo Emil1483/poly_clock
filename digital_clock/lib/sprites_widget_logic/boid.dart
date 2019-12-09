@@ -3,15 +3,16 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
-class Boid{
+class Boid {
   static const double observeRadius = 12;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
-  static const double speed = 2.2;
+  static const double speed = 1.2; //2.2;
 
-  static const double alignmentForce = 0.5;
-  static const double cohesionForce = 0.5;
-  static const double separationForce = 0.6;
+  static const double alignmentForce = 0.2;
+  static const double cohesionForce = 0.2;
+  static const double separationForce = 0.15;
+  static const double locateForce = 0.25;
 
   static const double padding = 2;
 
@@ -19,6 +20,8 @@ class Boid{
   Vector2 pos;
   Vector2 vel;
   Vector2 acc;
+
+  Vector2 target;
 
   Boid(Size size) {
     canvasSize = size;
@@ -32,8 +35,14 @@ class Boid{
       r.nextDouble() - 0.5,
       r.nextDouble() - 0.5,
     );
-
     acc = Vector2.zero();
+
+    final double radius = math.Random().nextDouble() * 100;
+    final double angle = math.Random().nextDouble() * math.pi * 2;
+    target = Vector2(
+      radius * math.cos(angle) + size.width / 2,
+      radius * math.sin(angle) + size.height / 2,
+    );
   }
 
   void edges() {
@@ -96,26 +105,35 @@ class Boid{
 
   void spearation(List<Boid> boids) {
     steer(
-        maxForce: separationForce,
-        getDesired: () {
-          Vector2 desired = Vector2.zero();
-          int total = 0;
-          for (Boid other in boids) {
-            if (other == this) continue;
-            final dist = pos.distanceTo(other.pos);
-            desired.add((pos - other.pos) / dist);
-            total++;
-          }
-          if (total == 0) return Vector2.copy(vel);
+      maxForce: separationForce,
+      getDesired: () {
+        Vector2 desired = Vector2.zero();
+        int total = 0;
+        for (Boid other in boids) {
+          if (other == this) continue;
+          final dist = pos.distanceTo(other.pos);
+          desired.add((pos - other.pos) / dist);
+          total++;
+        }
+        if (total == 0) return Vector2.copy(vel);
 
-          return desired;
-        });
+        return desired;
+      },
+    );
+  }
+
+  void locate() {
+    steer(
+      maxForce: locateForce,
+      getDesired: () => target - pos,
+    );
   }
 
   void flock(List<Boid> boids) {
     alignment(boids);
     cohesion(boids);
     spearation(boids);
+    locate();
   }
 
   void applyForce(Vector2 force) {
@@ -124,7 +142,14 @@ class Boid{
 
   void update() {
     edges();
+
     vel.add(acc);
+    final dist = pos.distanceToSquared(target);
+    vel.scale(dist / 700);
+    if (vel.length2 > speed * speed) {
+      vel.normalize();
+      vel.scale(speed);
+    }
     pos.add(vel);
 
     acc.setZero();
