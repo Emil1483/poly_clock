@@ -9,7 +9,7 @@ import './boid.dart';
 import './quad_tree.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: add steering toward part of number
+  //TODO: add steering toward part of number. Use https://pub.dev/packages/image#-readme-tab-
   //TODO: make it fancy with triangles
 
   DateTime dateTime = DateTime.now();
