@@ -7,12 +7,12 @@ class Boid {
   static const double observeRadius = 12;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
-  static const double speed = 1.2; //2.2;
+  static const double speed = 2.2;
 
   static const double alignmentForce = 0.2;
-  static const double cohesionForce = 0.2;
-  static const double separationForce = 0.15;
-  static const double locateForce = 0.25;
+  static const double cohesionForce = 0.15;
+  static const double separationForce = 0.2;
+  static const double locateForce = 0.18;
 
   static const double padding = 2;
 
@@ -23,8 +23,10 @@ class Boid {
 
   Vector2 target;
 
-  Boid(Size size) {
+  Boid(Size size, Vector2 t) {
     canvasSize = size;
+
+    target = Vector2.copy(t);
 
     pos = Vector2.random();
     pos.x *= canvasSize.width;
@@ -36,13 +38,6 @@ class Boid {
       r.nextDouble() - 0.5,
     );
     acc = Vector2.zero();
-
-    final double radius = math.Random().nextDouble() * 100;
-    final double angle = math.Random().nextDouble() * math.pi * 2;
-    target = Vector2(
-      radius * math.cos(angle) + size.width / 2,
-      radius * math.sin(angle) + size.height / 2,
-    );
   }
 
   void edges() {
@@ -141,7 +136,7 @@ class Boid {
   }
 
   void update() {
-    edges();
+    //edges();
 
     vel.add(acc);
     final dist = pos.distanceToSquared(target);
