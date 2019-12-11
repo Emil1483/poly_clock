@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_clock_helper/model.dart';
 import 'package:spritewidget/spritewidget.dart';
 import 'package:vector_math/vector_math.dart';
@@ -12,7 +11,6 @@ import './boid.dart';
 import './quad_tree.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: add steering toward part of number. Use https://pub.dev/packages/image#-readme-tab-
   //TODO: make it fancy with triangles
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
@@ -27,14 +25,6 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
-    addBoids();
-  }
-
-  void addBoids() {
-    addFromChar("0", 0);
-    addFromChar("2", 1);
-    addFromChar("4", 2);
-    addFromChar("0", 3);
   }
 
   void addFromImage(
@@ -77,7 +67,7 @@ class SpriteWidgetRoot extends NodeWithSize {
     }
   }
 
-  void addFromChar(String char, int index) {
+  void addFromChar(int index, String char, {bool update = false}) {
     final double padding = 25;
     final double width = size.width / 6.5;
     final double height = size.height * 0.65;
@@ -88,6 +78,7 @@ class SpriteWidgetRoot extends NodeWithSize {
       photo,
       width: width,
       height: height,
+      boidIndex: update ? index : null,
       xOff: index * width +
           (index >= 2 ? size.width - width * 4 : 0) +
           (index >= 2 ? -padding : padding) +
@@ -96,11 +87,30 @@ class SpriteWidgetRoot extends NodeWithSize {
     );
   }
 
-  void updateChar(int index, String char) {}
+  String charAt(int number, int index) =>
+      number.toString().substring(index, index + 1);
 
   void setTime(DateTime time) {
+    if (boids.length == 0) {
+      addFromChar(0, charAt(time.hour, 0));
+      addFromChar(1, charAt(time.hour, 1));
+      addFromChar(2, charAt(time.minute, 0));
+      addFromChar(3, charAt(time.minute, 1));
+      return;
+    }
+
+    addFromChar(3, charAt(time.minute, 1), update: true);
+
+    if (charAt(time.minute, 0) != charAt(dateTime.minute, 0))
+      addFromChar(2, charAt(time.minute, 0), update: true);
+
+    if (charAt(time.hour, 1) != charAt(dateTime.hour, 1))
+      addFromChar(1, charAt(time.hour, 1), update: true);
+
+    if (charAt(time.hour, 0) != charAt(dateTime.hour, 0))
+      addFromChar(0, charAt(time.hour, 0), update: true);
+
     dateTime = time;
-    print(time);
   }
 
   void updateModel(ClockModel model) => clockModel = model;
