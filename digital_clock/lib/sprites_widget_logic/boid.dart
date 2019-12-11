@@ -124,6 +124,10 @@ class Boid {
     );
   }
 
+  void setTarget(Vector2 t) {
+    target.setFrom(t);
+  }
+
   void flock(List<Boid> boids) {
     alignment(boids);
     cohesion(boids);
