@@ -19,7 +19,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 100;
+  static const int boidsPerChar = 135;
 
   QuadTree qTree;
 
