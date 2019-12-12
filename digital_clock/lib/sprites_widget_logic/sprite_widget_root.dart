@@ -87,8 +87,10 @@ class SpriteWidgetRoot extends NodeWithSize {
     );
   }
 
-  String charAt(int number, int index) =>
-      number.toString().substring(index, index + 1);
+  String charAt(int number, int index) {
+    String numString = (number < 10 ? "0" : "") + number.toString();
+    return numString.substring(index, index + 1);
+  }
 
   void setTime(DateTime time) {
     if (boids.length == 0) {
@@ -129,11 +131,15 @@ class SpriteWidgetRoot extends NodeWithSize {
       );
     }
     for (Boid boid in boids) {
-      List<Point> data = qTree.circleQuery(boid.pos, Boid.observeRadius);
-      List<Boid> others = data.map((Point p) => p.data as Boid).toList();
+      List<Boid> others = queryBoids(boid.pos);
       boid.flock(others);
       boid.update();
     }
+  }
+
+  List<Boid> queryBoids(Vector2 pos) {
+    List<Point> data = qTree.circleQuery(pos, Boid.observeRadius);
+    return data.map((Point p) => p.data as Boid).toList();
   }
 
   @override
