@@ -133,7 +133,7 @@ class SpriteWidgetRoot extends NodeWithSize {
     }
     for (Boid boid in boids) {
       List<Boid> others = queryBoids(boid.pos);
-      boid.flock([]);
+      boid.flock(others);
       boid.update();
     }
   }
@@ -147,8 +147,8 @@ class SpriteWidgetRoot extends NodeWithSize {
   @override
   void paint(Canvas canvas) {
     for (Boid boid in boids) {
-      //List<Boid> others = queryBoids(boid.pos);
-      boid.paint(canvas, []);
+      List<Boid> others = queryBoids(boid.pos);
+      boid.paint(canvas, others);
     }
   }
 }

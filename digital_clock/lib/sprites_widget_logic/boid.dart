@@ -160,6 +160,7 @@ class Boid {
       Paint paint = Paint();
       paint.color = Color(0xff000000);
 
+      continue;
       canvas.drawLine(
         Offset(pos.x, pos.y),
         Offset(other.pos.x, other.pos.y),
