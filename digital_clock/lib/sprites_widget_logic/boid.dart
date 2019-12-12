@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
 class Boid {
-  static const double observeRadius = 12;
+  static const double observeRadius = 26;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
   static const double speed = 2.2;
 
-  static const double alignmentForce = 0.2;
-  static const double cohesionForce = 0.15;
-  static const double separationForce = 0.2;
-  static const double locateForce = 0.18;
+  static const double alignmentForce = 0.18;
+  static const double cohesionForce = 0.13;
+  static const double separationForce = 0.18;
+  static const double locateForce = 0.2;
 
   static const double padding = 2;
 
@@ -154,11 +154,24 @@ class Boid {
     acc.setZero();
   }
 
-  void paint(Canvas canvas) {
+  void paint(Canvas canvas, List<Boid> others) {
+    for (Boid other in others) {
+      if (other == this) continue;
+      Paint paint = Paint();
+      paint.color = Color(0xff000000);
+
+      canvas.drawLine(
+        Offset(pos.x, pos.y),
+        Offset(other.pos.x, other.pos.y),
+        paint,
+      );
+    }
+    //return;
     canvas.drawCircle(
       Offset(pos.x, pos.y),
-      padding,
+      5,
       Paint()..color = Color(0xFF000000),
     );
+    return;
   }
 }

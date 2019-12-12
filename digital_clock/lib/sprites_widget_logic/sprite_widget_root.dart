@@ -19,7 +19,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 135;
+  static const int boidsPerChar = 80;
 
   QuadTree qTree;
 
@@ -69,9 +69,9 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   void addFromChar(int index, String char, {bool update = false}) {
     final double padding = 25;
-    final double width = size.width / 6.5;
-    final double height = size.height * 0.65;
-    final double between = 25;
+    final double width = size.width / 8;
+    final double height = size.height * 0.55;
+    final double between = 45;
     img.Image text = img.drawChar(img.Image(21, 35), img.arial_48, 0, 0, char);
     img.Image photo = img.copyResize(text, height: 400, width: -1);
     addFromImage(
@@ -119,6 +119,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
+    print(1/_);
     qTree = QuadTree(
       pos: Vector2(size.width / 2, size.height / 2),
       w: size.width,
@@ -132,12 +133,13 @@ class SpriteWidgetRoot extends NodeWithSize {
     }
     for (Boid boid in boids) {
       List<Boid> others = queryBoids(boid.pos);
-      boid.flock(others);
+      boid.flock([]);
       boid.update();
     }
   }
 
   List<Boid> queryBoids(Vector2 pos) {
+    if (qTree == null) return [];
     List<Point> data = qTree.circleQuery(pos, Boid.observeRadius);
     return data.map((Point p) => p.data as Boid).toList();
   }
@@ -145,7 +147,8 @@ class SpriteWidgetRoot extends NodeWithSize {
   @override
   void paint(Canvas canvas) {
     for (Boid boid in boids) {
-      boid.paint(canvas);
+      //List<Boid> others = queryBoids(boid.pos);
+      boid.paint(canvas, []);
     }
   }
 }
