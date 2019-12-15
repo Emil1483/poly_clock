@@ -12,7 +12,7 @@ import './quad_tree.dart';
 import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: make it fancy with triangles
+  //TODO: fix delonay
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   DateTime dateTime = DateTime.now();
@@ -20,7 +20,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 10;
+  static const int boidsPerChar = 1;
 
   QuadTree qTree;
 
