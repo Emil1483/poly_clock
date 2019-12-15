@@ -119,7 +119,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
-    print(1/_);
+    //print(1/_);
     qTree = QuadTree(
       pos: Vector2(size.width / 2, size.height / 2),
       w: size.width,
