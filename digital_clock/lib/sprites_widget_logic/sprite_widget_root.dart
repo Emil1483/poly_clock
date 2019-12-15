@@ -9,6 +9,7 @@ import 'package:image/image.dart' as img;
 
 import './boid.dart';
 import './quad_tree.dart';
+import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: make it fancy with triangles
@@ -19,7 +20,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 80;
+  static const int boidsPerChar = 10;
 
   QuadTree qTree;
 
@@ -149,6 +150,23 @@ class SpriteWidgetRoot extends NodeWithSize {
     for (Boid boid in boids) {
       List<Boid> others = queryBoids(boid.pos);
       boid.paint(canvas, others);
+    }
+    List<List<double>> vertices = boids.map((Boid b) {
+      return [b.pos.x, b.pos.y];
+    }).toList();
+    final result = Delaunay.triangulate(vertices, null);
+    for (int i = 0; i < result.length; i += 3) {
+      final Vector2 p1 = boids[result[i].round()].pos;
+      final Vector2 p2 = boids[result[i + 1].round()].pos;
+      final Vector2 p3 = boids[result[i + 2].round()].pos;
+      canvas.drawPath(
+          Path()
+            ..moveTo(p1.x, p1.y)
+            ..lineTo(p2.x, p2.y)
+            ..lineTo(p3.x, p3.y),
+          Paint()
+            ..color =
+                Color.fromARGB(255, 255, 0, (p1.x * 255 / size.width).round()));
     }
   }
 }
