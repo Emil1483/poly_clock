@@ -11,8 +11,8 @@ class MaybeTriangle {
 List<List<double>> supertriangle(List<List<double>> vertices) {
   double xmin = double.infinity;
   double ymin = double.infinity;
-  double xmax = double.infinity;
-  double ymax = double.infinity;
+  double xmax = double.negativeInfinity;
+  double ymax = double.negativeInfinity;
 
   for (List<double> vertex in vertices) {
     if (vertex[0] < xmin) xmin = vertex[0];
@@ -77,13 +77,14 @@ MaybeTriangle circumcircle(List<List<double>> vertices, int i, int j, int k) {
   return MaybeTriangle(i: i, j: j, k: k, x: xc, y: yc, r: dx * dx + dy * dy);
 }
 
-void depup(List<double> edges) {
+void depup(List<int> edges) {
   for (int j = edges.length; j >= 2;) {
-    final double b = edges[--j];
-    final double a = edges[--j];
+    while (j > edges.length) j -= 2;
+    final int b = edges[--j];
+    final int a = edges[--j];
     for (int i = j; i >= 2;) {
-      final double n = edges[--i];
-      final double m = edges[--i];
+      final int n = edges[--i];
+      final int m = edges[--i];
       if ((a == m && b == n) || (a == n && b == m)) {
         edges..removeAt(j + 1)..removeAt(j);
         edges..removeAt(i + 1)..removeAt(i);
@@ -91,4 +92,65 @@ void depup(List<double> edges) {
       }
     }
   }
+}
+
+List<int> triangulate(List<List<double>> vertices) {
+  final int n = vertices.length;
+  if (n < 3) return [];
+
+  vertices = List.from(vertices);
+
+  final List<int> indices = List(n);
+  for (int i = 0; i < indices.length; i++) {
+    indices[i] = i;
+  }
+
+  indices.sort((int i, int j) {
+    final double diff = vertices[i][0] - vertices[j][0];
+    return diff == 0.0 ? i - j : diff.round();
+  });
+
+  final List<List<double>> st = supertriangle(vertices);
+  vertices.addAll([st[0], st[1], st[2]]);
+
+  final MaybeTriangle circCircle = circumcircle(vertices, n + 0, n + 1, n + 2);
+  if (circCircle == null) return [];
+
+  List<MaybeTriangle> open = [circumcircle(vertices, n + 0, n + 1, n + 2)];
+  List<MaybeTriangle> closed = [];
+  List<int> edges = [];
+
+  for (int i = indices.length - 1; i >= 0; i--) {
+    final int c = indices[i];
+    for (int j = open.length - 1; j >= 0; j--) {
+      final double dx = vertices[c][0] - open[j].x;
+      if (dx > 0.0 && dx * dx > open[j].r) {
+        closed.add(open[j]);
+        open.removeAt(j);
+        continue;
+      }
+      final double dy = vertices[c][1] - open[j].y;
+      if (dx * dx + dy * dy - open[j].r > EPSILON) continue;
+
+      edges.addAll([
+        open[j].i,
+        open[j].j,
+        open[j].j,
+        open[j].k,
+        open[j].k,
+        open[j].i,
+      ]);
+      open.removeAt(j);
+    }
+
+    depup(edges);
+
+    for (int j = edges.length; j >= 2;) {
+      final int b = edges[--j];
+      final int a = edges[--j];
+      open.add(circumcircle(vertices, a, b, c));
+    }
+  }
+
+  return [];
 }

@@ -20,12 +20,17 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 1;
+  static const int boidsPerChar = 10;
 
   QuadTree qTree;
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
+    triangulate([
+      [1.5, 1.9],
+      [0.9, 1.1],
+      [1.2, 1.2],
+    ]);
   }
 
   void addFromImage(
@@ -151,6 +156,10 @@ class SpriteWidgetRoot extends NodeWithSize {
       List<Boid> others = queryBoids(boid.pos);
       boid.paint(canvas, others);
     }
+    return;
+    triangulate(
+      boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
+    );
     /*
     List<List<double>> vertices = boids.map((Boid b) {
       return [b.pos.x, b.pos.y];
