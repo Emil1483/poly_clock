@@ -9,7 +9,7 @@ import 'package:image/image.dart' as img;
 
 import './boid.dart';
 import './quad_tree.dart';
-import './delaunay.dart';
+import './delaunay2.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: fix delonay
@@ -151,6 +151,7 @@ class SpriteWidgetRoot extends NodeWithSize {
       List<Boid> others = queryBoids(boid.pos);
       boid.paint(canvas, others);
     }
+    /*
     List<List<double>> vertices = boids.map((Boid b) {
       return [b.pos.x, b.pos.y];
     }).toList();
@@ -168,5 +169,6 @@ class SpriteWidgetRoot extends NodeWithSize {
             ..color =
                 Color.fromARGB(255, 255, 0, (p1.x * 255 / size.width).round()));
     }
+    */
   }
 }
