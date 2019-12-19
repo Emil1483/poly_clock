@@ -12,7 +12,7 @@ import './quad_tree.dart';
 import './delaunay2.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: fix delonay
+  //TODO: test and fix triangulate()
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   DateTime dateTime = DateTime.now();
@@ -26,11 +26,6 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
-    triangulate([
-      [1.5, 1.9],
-      [0.9, 1.1],
-      [1.2, 1.2],
-    ]);
   }
 
   void addFromImage(
@@ -156,10 +151,20 @@ class SpriteWidgetRoot extends NodeWithSize {
       List<Boid> others = queryBoids(boid.pos);
       boid.paint(canvas, others);
     }
-    return;
-    triangulate(
+    final List<int> result = triangulate(
       boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
     );
+    for (int i = 0; i < result.length; i += 3) {
+      final Vector2 p1 = boids[result[i].round()].pos;
+      final Vector2 p2 = boids[result[i + 1].round()].pos;
+      final Vector2 p3 = boids[result[i + 2].round()].pos;
+      canvas.drawPath(
+          Path()
+            ..moveTo(p1.x, p1.y)
+            ..lineTo(p2.x, p2.y)
+            ..lineTo(p3.x, p3.y),
+            Paint()..style = PaintingStyle.stroke);
+    }
     /*
     List<List<double>> vertices = boids.map((Boid b) {
       return [b.pos.x, b.pos.y];

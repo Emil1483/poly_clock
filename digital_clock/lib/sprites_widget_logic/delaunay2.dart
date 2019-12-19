@@ -77,14 +77,20 @@ MaybeTriangle circumcircle(List<List<double>> vertices, int i, int j, int k) {
   return MaybeTriangle(i: i, j: j, k: k, x: xc, y: yc, r: dx * dx + dy * dy);
 }
 
-void depup(List<int> edges) {
-  for (int j = edges.length; j >= 2;) {
+void dedup(List<int> edges) {
+  int i, j;
+  int a, b, m, n;
+
+  for (j = edges.length; j > 1;) {
     while (j > edges.length) j -= 2;
-    final int b = edges[--j];
-    final int a = edges[--j];
-    for (int i = j; i >= 2;) {
-      final int n = edges[--i];
-      final int m = edges[--i];
+    if (j < 2) continue;
+    b = edges[--j];
+    a = edges[--j];
+
+    for (i = j; i > 1;) {
+      n = edges[--i];
+      m = edges[--i];
+
       if ((a == m && b == n) || (a == n && b == m)) {
         edges..removeAt(j + 1)..removeAt(j);
         edges..removeAt(i + 1)..removeAt(i);
@@ -106,7 +112,7 @@ List<int> triangulate(List<List<double>> vertices) {
   }
 
   indices.sort((int i, int j) {
-    final double diff = vertices[i][0] - vertices[j][0];
+    final double diff = vertices[j][0] - vertices[i][0];
     return diff == 0.0 ? i - j : diff.round();
   });
 
@@ -121,6 +127,7 @@ List<int> triangulate(List<List<double>> vertices) {
   List<int> edges = [];
 
   for (int i = indices.length - 1; i >= 0; i--) {
+    edges.length = 0;
     final int c = indices[i];
     for (int j = open.length - 1; j >= 0; j--) {
       final double dx = vertices[c][0] - open[j].x;
@@ -143,7 +150,7 @@ List<int> triangulate(List<List<double>> vertices) {
       open.removeAt(j);
     }
 
-    depup(edges);
+    dedup(edges);
 
     for (int j = edges.length; j >= 2;) {
       final int b = edges[--j];
@@ -151,6 +158,19 @@ List<int> triangulate(List<List<double>> vertices) {
       open.add(circumcircle(vertices, a, b, c));
     }
   }
+  edges.length = 0;
 
-  return [];
+  for (int i = 0; i < open.length; i++) {
+    closed.add(open[i]);
+  }
+  open.length = 0;
+
+  List<int> output = [];
+  for (int i = 0; i < closed.length; i++) {
+    if (closed[i].i < n && closed[i].j < n && closed[i].k < n) {
+      output.addAll([closed[i].i, closed[i].j, closed[i].k]);
+    }
+  }
+
+  return output;
 }
