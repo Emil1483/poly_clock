@@ -19,7 +19,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 120;
+  static const int boidsPerChar = 140;
 
   QuadTree qTree;
 
@@ -119,7 +119,6 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
-    //print(1/_);
     qTree = QuadTree(
       pos: Vector2(size.width / 2, size.height / 2),
       w: size.width,
@@ -153,6 +152,13 @@ class SpriteWidgetRoot extends NodeWithSize {
       final Vector2 p1 = boids[result[i].round()].pos;
       final Vector2 p2 = boids[result[i + 1].round()].pos;
       final Vector2 p3 = boids[result[i + 2].round()].pos;
+
+      final double distThreshSq = 500;
+
+      if (p1.distanceToSquared(p2) > distThreshSq) continue;
+      if (p2.distanceToSquared(p3) > distThreshSq) continue;
+      if (p1.distanceToSquared(p3) > distThreshSq) continue;
+
       canvas.drawPath(
           Path()
             ..moveTo(p1.x, p1.y)

@@ -12,7 +12,7 @@ class Boid {
   static const double alignmentForce = 0.18;
   static const double cohesionForce = 0.13;
   static const double separationForce = 0.18;
-  static const double locateForce = 0.2;
+  static const double locateForce = 0.22;
 
   static const double padding = 2;
 
@@ -38,13 +38,6 @@ class Boid {
       r.nextDouble() - 0.5,
     );
     acc = Vector2.zero();
-  }
-
-  void edges() {
-    if (pos.x < -padding) pos.x = canvasSize.width + padding;
-    if (pos.x > canvasSize.width + padding) pos.x = -padding;
-    if (pos.y < -padding) pos.y = canvasSize.height + padding;
-    if (pos.y > canvasSize.height + padding) pos.y = -padding;
   }
 
   void steer({
@@ -140,8 +133,6 @@ class Boid {
   }
 
   void update() {
-    //edges();
-
     vel.add(acc);
     final dist = pos.distanceToSquared(target);
     vel.scale(dist / 700);
@@ -149,30 +140,7 @@ class Boid {
       vel.normalize();
       vel.scale(speed);
     }
-    pos.add(vel);
 
     acc.setZero();
-  }
-
-  void paint(Canvas canvas, List<Boid> others) {
-    for (Boid other in others) {
-      if (other == this) continue;
-      Paint paint = Paint();
-      paint.color = Color(0xff000000);
-
-      continue;
-      canvas.drawLine(
-        Offset(pos.x, pos.y),
-        Offset(other.pos.x, other.pos.y),
-        paint,
-      );
-    }
-    //return;
-    canvas.drawCircle(
-      Offset(pos.x, pos.y),
-      5,
-      Paint()..color = Color(0xFF000000),
-    );
-    return;
   }
 }
