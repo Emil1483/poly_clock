@@ -23,6 +23,8 @@ class Boid {
 
   Vector2 target;
 
+  double colorConst;
+
   Boid(Size size, Vector2 t) {
     canvasSize = size;
 
@@ -38,6 +40,8 @@ class Boid {
       r.nextDouble() - 0.5,
     );
     acc = Vector2.zero();
+
+    colorConst = r.nextDouble() * 2 - 1;
   }
 
   void steer({
@@ -140,6 +144,10 @@ class Boid {
       vel.normalize();
       vel.scale(speed);
     }
+    pos.add(vel);
+
+    colorConst += vel.length2 / 50;
+    if (colorConst > 1) colorConst = -1;
 
     acc.setZero();
   }

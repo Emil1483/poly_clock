@@ -149,22 +149,26 @@ class SpriteWidgetRoot extends NodeWithSize {
       boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
     );
     for (int i = 0; i < result.length; i += 3) {
-      final Vector2 p1 = boids[result[i].round()].pos;
-      final Vector2 p2 = boids[result[i + 1].round()].pos;
-      final Vector2 p3 = boids[result[i + 2].round()].pos;
+      final Boid p1 = boids[result[i].round()];
+      final Boid p2 = boids[result[i + 1].round()];
+      final Boid p3 = boids[result[i + 2].round()];
 
       final double distThreshSq = 500;
 
-      if (p1.distanceToSquared(p2) > distThreshSq) continue;
-      if (p2.distanceToSquared(p3) > distThreshSq) continue;
-      if (p1.distanceToSquared(p3) > distThreshSq) continue;
+      if (p1.pos.distanceToSquared(p2.pos) > distThreshSq) continue;
+      if (p2.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
+      if (p1.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
+
+      final double hue = p1.colorConst > 0 ? 165 + p1.colorConst * 60 : 225 + p1.colorConst * 60;
 
       canvas.drawPath(
           Path()
-            ..moveTo(p1.x, p1.y)
-            ..lineTo(p2.x, p2.y)
-            ..lineTo(p3.x, p3.y),
-            Paint()..style = PaintingStyle.stroke);
+            ..moveTo(p1.pos.x, p1.pos.y)
+            ..lineTo(p2.pos.x, p2.pos.y)
+            ..lineTo(p3.pos.x, p3.pos.y),
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = HSLColor.fromAHSL(1, hue, 1, 0.5).toColor());
     }
   }
 }
