@@ -9,7 +9,7 @@ import 'package:image/image.dart' as img;
 
 import './boid.dart';
 import './quad_tree.dart';
-import './delaunay2.dart';
+import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
