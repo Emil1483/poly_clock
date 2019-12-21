@@ -30,18 +30,12 @@ class Boid {
 
     target = Vector2.copy(t);
 
-    pos = Vector2.random();
-    pos.x *= canvasSize.width;
-    pos.y *= canvasSize.height;
+    pos = Vector2.copy(t);
 
-    final r = math.Random();
-    vel = Vector2(
-      r.nextDouble() - 0.5,
-      r.nextDouble() - 0.5,
-    );
+    vel = Vector2.zero();
     acc = Vector2.zero();
 
-    colorConst = r.nextDouble() * 2 - 1;
+    colorConst = math.Random().nextDouble() * 2 - 1;
   }
 
   void steer({
