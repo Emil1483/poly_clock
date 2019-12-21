@@ -1,7 +1,9 @@
 import 'dart:ui';
 import 'dart:math' as math;
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_clock_helper/model.dart';
 import 'package:spritewidget/spritewidget.dart';
 import 'package:vector_math/vector_math.dart';
@@ -19,98 +21,83 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 140;
+  static const int boidsPerChar = 100;
 
   QuadTree qTree;
+
+  List<List<Vector2>> numbers = [];
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
   }
 
-  void addFromImage(
-    img.Image image, {
-    @required double width,
-    @required double height,
-    @required double xOff,
-    int boidIndex,
-  }) {
-    Color pixel32ToColor(int argbColor) {
-      int r = (argbColor >> 16) & 0xFF;
-      int b = argbColor & 0xFF;
-      return Color((argbColor & 0xFF00FF00) | (b << 16) | r);
-    }
-
-    List<Color> pixels = image.data.map(pixel32ToColor).toList();
-    List<Vector2> goodSpots = [];
-    for (int i = 0; i < image.width; i++) {
-      for (int j = 0; j < image.height; j++) {
-        int index = i + j * image.width;
-        if (pixels[index] == Color(0xffffffff)) {
-          double x = i * width / image.width + xOff;
-          double y = j * height / image.height + (size.height - height) / 2;
-          goodSpots.add(Vector2(x, y));
-        }
-      }
-    }
-
-    if (boidIndex == null) {
-      for (int i = 0; i < boidsPerChar; i++) {
-        int index = math.Random().nextInt(goodSpots.length);
-        boids.add(Boid(size, goodSpots[index]));
-      }
-    } else {
-      for (int i = 0; i < boidsPerChar; i++) {
-        int index = math.Random().nextInt(goodSpots.length);
-        int boid = boidIndex * boidsPerChar + i;
-        boids[boid].setTarget(goodSpots[index]);
-      }
+  Future<void> initNumbers() async {
+    for (int i = 0; i < 10; i++) {
+      String jsonString = await rootBundle.loadString('assets/${i >= 1 && i <= 4 ? i : 1}.json');
+      final List<dynamic> pointsData = json.decode(jsonString)["points"];
+      List<Vector2> number = pointsData
+          .map((dynamic value) => Vector2(
+                value["x"].toDouble(),
+                value["y"].toDouble(),
+              ))
+          .toList();
+      numbers.add(number);
     }
   }
 
-  void addFromChar(int index, String char, {bool update = false}) {
+  void updateBoids(int index, int number, {bool update = true}) async {
     final double padding = 25;
     final double width = size.width / 8;
     final double height = size.height * 0.55;
     final double between = 45;
-    img.Image text = img.drawChar(img.Image(21, 35), img.arial_48, 0, 0, char);
-    img.Image photo = img.copyResize(text, height: 400, width: -1);
-    addFromImage(
-      photo,
-      width: width,
-      height: height,
-      boidIndex: update ? index : null,
-      xOff: index * width +
+
+    final List<Vector2> possible = numbers[number];
+    possible.shuffle();
+    for (int j = 0; j < boidsPerChar; j++) {
+      double xOff = index * width +
           (index >= 2 ? size.width - width * 4 : 0) +
           (index >= 2 ? -padding : padding) +
           (index == 1 ? between : 0) +
-          (index == 2 ? -between : 0),
-    );
+          (index == 2 ? -between : 0);
+
+      Vector2 pos = Vector2.copy(possible[j]);
+      pos.x *= width;
+      pos.y *= height;
+      pos += Vector2(xOff, (size.height - height) / 2);
+
+      if (update) {
+        boids[index * boidsPerChar + j].setTarget(pos);
+      } else {
+        boids.add(Boid(size, pos));
+      }
+    }
   }
 
-  String charAt(int number, int index) {
+  int intAt(int number, int index) {
     String numString = (number < 10 ? "0" : "") + number.toString();
-    return numString.substring(index, index + 1);
+    return int.parse(numString.substring(index, index + 1));
   }
 
-  void setTime(DateTime time) {
+  void setTime(DateTime time) async {
     if (boids.length == 0) {
-      addFromChar(0, charAt(time.hour, 0));
-      addFromChar(1, charAt(time.hour, 1));
-      addFromChar(2, charAt(time.minute, 0));
-      addFromChar(3, charAt(time.minute, 1));
+      await initNumbers();
+      updateBoids(0, intAt(time.hour, 0), update: false);
+      updateBoids(1, intAt(time.hour, 1), update: false);
+      updateBoids(2, intAt(time.minute, 0), update: false);
+      updateBoids(3, intAt(time.minute, 1), update: false);
       return;
     }
 
-    addFromChar(3, charAt(time.minute, 1), update: true);
+    updateBoids(3, intAt(time.minute, 1));
 
-    if (charAt(time.minute, 0) != charAt(dateTime.minute, 0))
-      addFromChar(2, charAt(time.minute, 0), update: true);
+    if (intAt(time.minute, 0) != intAt(dateTime.minute, 0))
+      updateBoids(2, intAt(time.minute, 0));
 
-    if (charAt(time.hour, 1) != charAt(dateTime.hour, 1))
-      addFromChar(1, charAt(time.hour, 1), update: true);
+    if (intAt(time.hour, 1) != intAt(dateTime.hour, 1))
+      updateBoids(1, intAt(time.hour, 1));
 
-    if (charAt(time.hour, 0) != charAt(dateTime.hour, 0))
-      addFromChar(0, charAt(time.hour, 0), update: true);
+    if (intAt(time.hour, 0) != intAt(dateTime.hour, 0))
+      updateBoids(0, intAt(time.hour, 0));
 
     dateTime = time;
   }
@@ -159,7 +146,9 @@ class SpriteWidgetRoot extends NodeWithSize {
       if (p2.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
       if (p1.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
 
-      final double hue = p1.colorConst > 0 ? 165 + p1.colorConst * 60 : 225 + p1.colorConst * 60;
+      final double hue = p1.colorConst > 0
+          ? 165 + p1.colorConst * 60
+          : 225 + p1.colorConst * 60;
 
       canvas.drawPath(
           Path()
