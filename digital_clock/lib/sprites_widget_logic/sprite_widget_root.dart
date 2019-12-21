@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:math' as math;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,13 +6,14 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_clock_helper/model.dart';
 import 'package:spritewidget/spritewidget.dart';
 import 'package:vector_math/vector_math.dart';
-import 'package:image/image.dart' as img;
 
 import './boid.dart';
 import './quad_tree.dart';
 import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
+  //TODO: fix and complete number jsons
+  //TODO: improve boid movement
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   DateTime dateTime = DateTime.now();
@@ -140,7 +140,7 @@ class SpriteWidgetRoot extends NodeWithSize {
       final Boid p2 = boids[result[i + 1].round()];
       final Boid p3 = boids[result[i + 2].round()];
 
-      final double distThreshSq = 500;
+      final double distThreshSq = 400;
 
       if (p1.pos.distanceToSquared(p2.pos) > distThreshSq) continue;
       if (p2.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
