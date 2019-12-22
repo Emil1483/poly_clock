@@ -12,8 +12,7 @@ import './quad_tree.dart';
 import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: fix and complete number jsons
-  //TODO: improve boid movement
+  //TODO: fix number jsons
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   DateTime dateTime = DateTime.now();
@@ -21,7 +20,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<Boid> boids = List<Boid>();
 
-  static const int boidsPerChar = 100;
+  static const int boidsPerChar = 115;
 
   QuadTree qTree;
 
@@ -34,7 +33,7 @@ class SpriteWidgetRoot extends NodeWithSize {
   Future<void> initNumbers() async {
     for (int i = 0; i < 10; i++) {
       String jsonString = await rootBundle
-          .loadString('assets/${i >= 1 && i <= 4 ? i : 1}.json');
+          .loadString('assets/$i.json');
       final List<dynamic> pointsData = json.decode(jsonString)["points"];
       List<Vector2> number = pointsData
           .map((dynamic value) => Vector2(
@@ -133,10 +132,11 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void paint(Canvas canvas) {
+    /*
     for (Boid boid in boids) {
       boid.paint(canvas);
     }
-    return;
+    */
 
     final List<int> result = triangulate(
       boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
@@ -146,7 +146,7 @@ class SpriteWidgetRoot extends NodeWithSize {
       final Boid p2 = boids[result[i + 1].round()];
       final Boid p3 = boids[result[i + 2].round()];
 
-      final double distThreshSq = 700; //400;
+      final double distThreshSq = 600; //400;
 
       if (p1.pos.distanceToSquared(p2.pos) > distThreshSq) continue;
       if (p2.pos.distanceToSquared(p3.pos) > distThreshSq) continue;

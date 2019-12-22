@@ -156,7 +156,8 @@ class Boid {
     }
 
     vel.add(acc);
-    pos.add(vel * far);
+    vel.scale(far);
+    pos.add(vel);
     edges();
 
     colorConst += vel.length2 / 50;
