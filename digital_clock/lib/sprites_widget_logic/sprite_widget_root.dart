@@ -12,6 +12,8 @@ import './quad_tree.dart';
 import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
+  //TODO: add effects for rain, snow, sun and thunderstorm
+  //TODO: change color by temperature
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   DateTime dateTime = DateTime.now();
@@ -30,9 +32,10 @@ class SpriteWidgetRoot extends NodeWithSize {
   }
 
   Future<void> initNumbers() async {
+    String jsonString = await rootBundle.loadString("assets/numbers.json");
+    final List<dynamic> numbersData = json.decode(jsonString)["numbers"];
     for (int i = 0; i < 10; i++) {
-      String jsonString = await rootBundle.loadString('assets/$i.json');
-      final List<dynamic> pointsData = json.decode(jsonString)["points"];
+      final List<dynamic> pointsData = numbersData[i]["points"];
       List<Vector2> number = pointsData
           .map((dynamic value) => Vector2(
                 value["x"].toDouble(),
@@ -131,11 +134,6 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void paint(Canvas canvas) {
-    /*
-    for (Boid boid in boids) {
-      boid.paint(canvas);
-    }
-    */
 
     final List<int> result = triangulate(
       boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),

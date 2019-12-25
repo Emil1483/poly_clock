@@ -24,6 +24,7 @@ flutter:
   uses-material-design: true
   assets:
     - "digital_dark.png"
+    - "numbers.json"
     - "0.json"
     - "1.json"
     - "2.json"
