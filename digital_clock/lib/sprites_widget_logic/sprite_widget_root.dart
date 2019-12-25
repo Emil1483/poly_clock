@@ -12,7 +12,6 @@ import './quad_tree.dart';
 import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: fix number jsons
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   DateTime dateTime = DateTime.now();
@@ -32,8 +31,7 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   Future<void> initNumbers() async {
     for (int i = 0; i < 10; i++) {
-      String jsonString = await rootBundle
-          .loadString('assets/$i.json');
+      String jsonString = await rootBundle.loadString('assets/$i.json');
       final List<dynamic> pointsData = json.decode(jsonString)["points"];
       List<Vector2> number = pointsData
           .map((dynamic value) => Vector2(
@@ -81,6 +79,7 @@ class SpriteWidgetRoot extends NodeWithSize {
   void setTime(DateTime time) async {
     if (boids.length == 0) {
       await initNumbers();
+
       updateBoids(0, intAt(time.hour, 0), update: false);
       updateBoids(1, intAt(time.hour, 1), update: false);
       updateBoids(2, intAt(time.minute, 0), update: false);
@@ -146,7 +145,7 @@ class SpriteWidgetRoot extends NodeWithSize {
       final Boid p2 = boids[result[i + 1].round()];
       final Boid p3 = boids[result[i + 2].round()];
 
-      final double distThreshSq = 600; //400;
+      final double distThreshSq = 500; //400;
 
       if (p1.pos.distanceToSquared(p2.pos) > distThreshSq) continue;
       if (p2.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
