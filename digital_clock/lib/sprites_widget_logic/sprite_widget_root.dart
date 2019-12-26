@@ -12,7 +12,7 @@ import './quad_tree.dart';
 import './delaunay.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: add effects for rain, snow, sun and thunderstorm
+  //TODO: add effects for rain, snow and thunderstorm
   //TODO: change color by temperature
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
