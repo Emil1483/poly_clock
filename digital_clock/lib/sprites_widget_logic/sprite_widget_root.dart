@@ -10,6 +10,7 @@ import 'package:vector_math/vector_math.dart';
 import './boid.dart';
 import './quad_tree.dart';
 import './delaunay.dart';
+import './effects.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: add effects for rain, snow and thunderstorm
@@ -27,8 +28,11 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   List<List<Vector2>> numbers = [];
 
+  Effects effects;
+
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
+    effects = Effects(size);
   }
 
   Future<void> initNumbers() async {
@@ -108,6 +112,8 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
+    effects.update();
+
     qTree = QuadTree(
       pos: Vector2(size.width / 2, size.height / 2),
       w: size.width,
@@ -134,6 +140,9 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void paint(Canvas canvas) {
+    if (boids.length == 0) return;
+    
+    effects.paint(canvas);
 
     final List<int> result = triangulate(
       boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
