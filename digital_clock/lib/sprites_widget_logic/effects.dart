@@ -1,7 +1,10 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math.dart';
+import 'package:image/image.dart' as img;
 
 abstract class Particle {
   static const double padding = 100;
@@ -70,11 +73,16 @@ class Rain extends Particle {
 }
 
 class Snow extends Particle {
+  final ui.Image image;
+  final Rect src;
+
   double t = math.Random().nextDouble() * math.pi * 2;
 
   Snow({
     @required Size size,
     @required double z,
+    @required this.image,
+    @required this.src,
   }) : super(size: size, z: z);
 
   @override
@@ -89,11 +97,17 @@ class Snow extends Particle {
 
   @override
   void paint(Canvas canvas) {
-    canvas.drawCircle(
-      Offset(pos.x, pos.y),
-      2 / (z * z),
-      Paint()..color = Color(0xFFFFFFFF),
+    final double size = 8 / (z * z);
+    canvas.save();
+    canvas.translate(pos.x, pos.y);
+    canvas.rotate(math.sin(t));
+    canvas.drawImageRect(
+      image,
+      src,
+      Rect.fromCenter(center: Offset.zero, width: size, height: size),
+      Paint(),
     );
+    canvas.restore();
   }
 }
 
@@ -102,12 +116,27 @@ class Effects {
   final Size size;
 
   Effects(this.size) {
+    addSnow();
+  }
+
+  void addSnow() async {
+    ByteData imageBytes = await rootBundle.load("assets/snow.png");
+    List<int> values = imageBytes.buffer.asUint8List();
+    ui.Image image = await decodeImageFromList(values);
+    math.Random r = math.Random();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < i * i * 40; j++) {
         particles.add(
           Snow(
             size: size,
             z: i * 0.35 + 0.65,
+            image: image,
+            src: Rect.fromLTWH(
+              r.nextInt(3).toDouble() * 51,
+              r.nextInt(3).toDouble() * 51,
+              50,
+              50,
+            ),
           ),
         );
       }
