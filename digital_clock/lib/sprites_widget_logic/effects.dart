@@ -80,7 +80,7 @@ class Snow extends Particle {
   @override
   void update() {
     pos.y += 0.5 / (z * z);
-    
+
     t += 0.025;
     pos.x += math.sin(t) / (2 * z * z);
 
@@ -102,11 +102,15 @@ class Effects {
   final Size size;
 
   Effects(this.size) {
-    final int max = 350;
-    for (int i = 0; i < max; i++) {
-      particles.add(
-        Snow(size: size, z: (i * i) * 0.75 / (max * max) + 1),
-      );
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < i * i * 40; j++) {
+        particles.add(
+          Snow(
+            size: size,
+            z: i * 0.35 + 0.65,
+          ),
+        );
+      }
     }
   }
 
