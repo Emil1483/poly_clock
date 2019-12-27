@@ -105,7 +105,7 @@ class Snow extends Particle {
       image,
       src,
       Rect.fromCenter(center: Offset.zero, width: size, height: size),
-      Paint(),
+      Paint()..color = Color.fromRGBO(0, 0, 0, math.min(z * z * 2, 255)),
     );
     canvas.restore();
   }
@@ -125,7 +125,7 @@ class Effects {
     ui.Image image = await decodeImageFromList(values);
     math.Random r = math.Random();
     for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < i * i * 40; j++) {
+      for (int j = 0; j < i * i * 35; j++) {
         particles.add(
           Snow(
             size: size,
