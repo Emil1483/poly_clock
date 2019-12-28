@@ -24,7 +24,7 @@ abstract class Particle {
     math.Random r = math.Random();
     pos = Vector2(
       r.nextDouble() * (size.width),
-      r.nextDouble() * size.height - size.height,
+      r.nextDouble() * (size.height + padding * 2) - size.height - padding * 2,
     );
   }
 
