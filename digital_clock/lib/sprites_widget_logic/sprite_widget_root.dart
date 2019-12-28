@@ -111,8 +111,6 @@ class SpriteWidgetRoot extends NodeWithSize {
   void updateModel(ClockModel model) async {
     effects.addEffect(model.weatherCondition);
 
-    effects.addEffect(WeatherCondition.snowy);
-
     clockModel = model;
   }
 
