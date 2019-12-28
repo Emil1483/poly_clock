@@ -245,7 +245,7 @@ class Effects {
   }
 
   void makeThunder() async {
-    thunderTimer = math.Random().nextDouble() * 15 + 2;
+    thunderTimer = math.Random().nextDouble() * 25 + 5;
 
     ByteData imageBytes = await rootBundle.load("assets/lightning.png");
     List<int> values = imageBytes.buffer.asUint8List();
