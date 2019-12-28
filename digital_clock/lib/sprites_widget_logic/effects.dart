@@ -3,8 +3,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_clock_helper/model.dart';
 import 'package:vector_math/vector_math.dart';
-import 'package:image/image.dart' as img;
 
 abstract class Particle {
   static const double padding = 100;
@@ -13,6 +13,10 @@ abstract class Particle {
   final double z;
   final Size size;
 
+  bool dead = false;
+  bool dying = false;
+  double aliveness = 1;
+
   Particle({
     @required this.size,
     @required this.z,
@@ -20,19 +24,28 @@ abstract class Particle {
     math.Random r = math.Random();
     pos = Vector2(
       r.nextDouble() * (size.width),
-      r.nextDouble() * (size.height + padding * 2) - padding,
+      r.nextDouble() * size.height - size.height,
     );
   }
 
-  void update();
+  void update() {
+    if (dying) aliveness -= 0.01;
+    if (aliveness <= 0) dead = true;
+  }
 
   void edges() {
     if (pos.y > size.height + padding) {
-      pos.y = -padding;
-      pos.x = math.Random().nextDouble() * (size.width);
+      if (dying) {
+        dead = true;
+      } else {
+        reset();
+      }
     }
-    if (pos.x > size.width + padding) pos.x = -padding;
-    if (pos.x < -padding) pos.x = size.width + padding;
+  }
+
+  void reset() {
+    pos.y = -padding;
+    pos.x = math.Random().nextDouble() * (size.width);
   }
 
   void paint(Canvas canvas);
@@ -53,6 +66,8 @@ class Rain extends Particle {
 
   @override
   void update() {
+    super.update();
+
     pos.y += speed / (z * z);
     super.edges();
   }
@@ -87,6 +102,8 @@ class Snow extends Particle {
 
   @override
   void update() {
+    super.update();
+
     pos.y += 0.5 / (z * z);
 
     t += 0.025;
@@ -105,18 +122,42 @@ class Snow extends Particle {
       image,
       src,
       Rect.fromCenter(center: Offset.zero, width: size, height: size),
-      Paint()..color = Color.fromRGBO(0, 0, 0, math.min(z * z * 2, 255)),
+      Paint()..color = Color.fromRGBO(0, 0, 0, (aliveness * 1.5 / (z * z)).clamp(0.0, 1.0)),
     );
     canvas.restore();
   }
 }
 
 class Effects {
+  static const Duration updateDelay = Duration(milliseconds: 10);
+
   final List<Particle> particles = List<Particle>();
   final Size size;
 
-  Effects(this.size) {
-    addSnow();
+  WeatherCondition weather;
+
+  Effects(this.size);
+
+  void addEffect(WeatherCondition condition) {
+    print(condition);
+    if (weather == condition) return;
+    weather = condition;
+
+    if (weather == WeatherCondition.snowy) {
+      clearParticles();
+      addSnow();
+    } else if (weather == WeatherCondition.rainy) {
+      clearParticles();
+      addRain();
+    } else if (weather == WeatherCondition.sunny) {
+      clearParticles();
+    }
+  }
+
+  void clearParticles() {
+    for (Particle particle in particles) {
+      particle.dying = true;
+    }
   }
 
   void addSnow() async {
@@ -126,6 +167,7 @@ class Effects {
     math.Random r = math.Random();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < i * i * 35; j++) {
+        if (weather != WeatherCondition.snowy) return;
         particles.add(
           Snow(
             size: size,
@@ -139,11 +181,27 @@ class Effects {
             ),
           ),
         );
+        await Future.delayed(updateDelay);
+      }
+    }
+  }
+
+  void addRain() async {
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < i * i * 35; j++) {
+        if (weather != WeatherCondition.rainy) return;
+        particles.add(
+          Rain(size: size, z: i * 0.35 + 0.65),
+        );
+        await Future.delayed(updateDelay);
       }
     }
   }
 
   void update() {
+    for (int i = particles.length - 1; i >= 0; i--) {
+      if (particles[i].dead) particles.removeAt(i);
+    }
     for (Particle p in particles) {
       p.update();
     }

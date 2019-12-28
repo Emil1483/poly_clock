@@ -108,7 +108,13 @@ class SpriteWidgetRoot extends NodeWithSize {
     dateTime = time;
   }
 
-  void updateModel(ClockModel model) => clockModel = model;
+  void updateModel(ClockModel model) async {
+    effects.addEffect(model.weatherCondition);
+
+    effects.addEffect(WeatherCondition.snowy);
+
+    clockModel = model;
+  }
 
   @override
   void update(_) {
@@ -141,7 +147,7 @@ class SpriteWidgetRoot extends NodeWithSize {
   @override
   void paint(Canvas canvas) {
     if (boids.length == 0) return;
-    
+
     effects.paint(canvas);
 
     final List<int> result = triangulate(
