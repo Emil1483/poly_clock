@@ -122,9 +122,47 @@ class Snow extends Particle {
       image,
       src,
       Rect.fromCenter(center: Offset.zero, width: size, height: size),
-      Paint()..color = Color.fromRGBO(0, 0, 0, (aliveness * 1.5 / (z * z)).clamp(0.0, 1.0)),
+      Paint()
+        ..color = Color.fromRGBO(
+            0, 0, 0, (aliveness * 1.5 / (z * z)).clamp(0.0, 1.0)),
     );
     canvas.restore();
+  }
+}
+
+class Thunder {
+  static const int lifeTime = 40;
+
+  final ui.Image image;
+  final Size size;
+
+  int timer = lifeTime;
+  double xOff;
+
+  Thunder({
+    @required this.image,
+    @required this.size,
+  }) {
+    xOff = math.Random().nextDouble() * (size.width + image.width / 2) -
+        image.width / 2;
+  }
+
+  bool get dead => timer <= 0;
+
+  void update() {
+    timer -= 1;
+  }
+
+  void paint(Canvas canvas) {
+    final double width = image.width.toDouble();
+    final double height = image.height.toDouble();
+    final double opacity = Curves.easeOutSine.transform(timer / lifeTime);
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, width, height),
+      Rect.fromLTWH(xOff, 0, width * size.height / height, size.height),
+      Paint()..color = Color.fromRGBO(0, 0, 0, opacity),
+    );
   }
 }
 
@@ -136,10 +174,12 @@ class Effects {
 
   WeatherCondition weather;
 
+  double thunderTimer;
+  List<Thunder> thunders = List<Thunder>();
+
   Effects(this.size);
 
   void addEffect(WeatherCondition condition) {
-    print(condition);
     if (weather == condition) return;
     weather = condition;
 
@@ -149,7 +189,10 @@ class Effects {
     } else if (weather == WeatherCondition.rainy) {
       clearParticles();
       addRain();
-    } else if (weather == WeatherCondition.sunny) {
+    } else if (thunder) {
+      clearParticles();
+      addThunder();
+    } else {
       clearParticles();
     }
   }
@@ -159,6 +202,8 @@ class Effects {
       particle.dying = true;
     }
   }
+
+  bool get thunder => weather == WeatherCondition.thunderstorm;
 
   void addSnow() async {
     ByteData imageBytes = await rootBundle.load("assets/snow.png");
@@ -188,7 +233,7 @@ class Effects {
 
   void addRain() async {
     for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < i * i * 35; j++) {
+      for (int j = 0; j < i * i * 40; j++) {
         if (weather != WeatherCondition.rainy) return;
         particles.add(
           Rain(size: size, z: i * 0.35 + 0.65),
@@ -198,18 +243,61 @@ class Effects {
     }
   }
 
+  void makeThunder() async {
+    thunderTimer = math.Random().nextDouble() * 15 + 2;
+    ByteData imageBytes = await rootBundle.load("assets/lightning.png");
+    List<int> values = imageBytes.buffer.asUint8List();
+    ui.Image image = await decodeImageFromList(values);
+    thunders.add(
+      Thunder(
+        image: image,
+        size: size,
+      ),
+    );
+  }
+
+  void addThunder() async {
+    makeThunder();
+    for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < i * i * 35; j++) {
+        if (!thunder) return;
+        particles.add(
+          Rain(size: size, z: i * 0.35 + 0.65),
+        );
+        await Future.delayed(updateDelay);
+      }
+    }
+  }
+
   void update() {
+    if (thunder) {
+      thunderTimer -= 0.05;
+      if (thunderTimer <= 0) {
+        makeThunder();
+      }
+    }
+
     for (int i = particles.length - 1; i >= 0; i--) {
       if (particles[i].dead) particles.removeAt(i);
     }
     for (Particle p in particles) {
       p.update();
     }
+
+    for (int i = thunders.length - 1; i >= 0; i--) {
+      if (thunders[i].dead) thunders.removeAt(i);
+    }
+    for (Thunder t in thunders) {
+      t.update();
+    }
   }
 
   void paint(Canvas canvas) {
     for (Particle p in particles) {
       p.paint(canvas);
+    }
+    for (Thunder t in thunders) {
+      t.paint(canvas);
     }
   }
 }
