@@ -25,4 +25,6 @@ flutter:
   assets:
     - "numbers.json"
     - "snow.png"
-    - "lightning.png"
+    - "lightning0.png"
+    - "lightning1.png"
+    - "lightning2.png"

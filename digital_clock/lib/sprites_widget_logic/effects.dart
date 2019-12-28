@@ -143,7 +143,8 @@ class Thunder {
     @required this.image,
     @required this.size,
   }) {
-    xOff = math.Random().nextDouble() * (size.width - image.width);
+    final double width = image.width * size.height / image.height;
+    xOff = math.Random().nextDouble() * (size.width + width / 2) - width / 4;
   }
 
   bool get dead => timer <= 0;
@@ -245,9 +246,12 @@ class Effects {
   }
 
   void makeThunder() async {
-    thunderTimer = math.Random().nextDouble() * 25 + 5;
+    math.Random r = math.Random();
 
-    ByteData imageBytes = await rootBundle.load("assets/lightning.png");
+    thunderTimer = r.nextDouble() * 25 + 5;
+
+    final int index = r.nextInt(3);
+    ByteData imageBytes = await rootBundle.load("assets/lightning$index.png");
     List<int> values = imageBytes.buffer.asUint8List();
     ui.Image image = await decodeImageFromList(values);
     thunders.add(
