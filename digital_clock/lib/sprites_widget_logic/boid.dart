@@ -160,11 +160,6 @@ class Boid {
 
   void update() {
     disableFar = (disableFar - shakeReduction).clamp(0.0, 1.0);
-    //if (disableFar > 0) {
-    //  disableFar -= shakeReduction;
-    //} else {
-    //  disableFar = 0;
-    //}
 
     far = ((pos.distanceToSquared(target) - closeThreshMin) /
             (closeThreshMax - closeThreshMin))
