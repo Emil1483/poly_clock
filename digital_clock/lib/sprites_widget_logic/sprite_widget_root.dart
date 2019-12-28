@@ -32,7 +32,11 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
-    effects = Effects(size);
+    effects = Effects(size, onThunder: () {
+      for (Boid boid in boids) {
+        boid.shakeVel();
+      }
+    });
   }
 
   Future<void> initNumbers() async {

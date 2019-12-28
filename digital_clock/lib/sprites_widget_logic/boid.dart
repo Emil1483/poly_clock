@@ -21,7 +21,11 @@ class Boid {
   static const double closeThreshMin = 50;
   static const double comingMult = 0.06;
 
+  static const double shakeReduction = 0.05;
+  static const double shakeMagnitude = 8;
+
   double far = 0.0;
+  double disableFar = 0.0;
 
   Size canvasSize;
   Vector2 pos;
@@ -43,6 +47,16 @@ class Boid {
     acc = Vector2.zero();
 
     colorConst = math.Random().nextDouble() * 2 - 1;
+  }
+
+  void shakeVel() {
+    disableFar = 1;
+
+    math.Random r = math.Random();
+    vel = Vector2(
+      r.nextDouble() * shakeMagnitude - shakeMagnitude / 2,
+      r.nextDouble() * shakeMagnitude - shakeMagnitude / 2,
+    );
   }
 
   void steer({
@@ -145,18 +159,25 @@ class Boid {
   }
 
   void update() {
+    disableFar = (disableFar - shakeReduction).clamp(0.0, 1.0);
+    //if (disableFar > 0) {
+    //  disableFar -= shakeReduction;
+    //} else {
+    //  disableFar = 0;
+    //}
+
     far = ((pos.distanceToSquared(target) - closeThreshMin) /
             (closeThreshMax - closeThreshMin))
         .clamp(0.0, 1.0);
     if (far < 1) {
       final double close = 1 - far;
       Vector2 diff = target - pos;
-      diff.scale(comingMult * close);
+      diff.scale(comingMult * close * (1 - disableFar));
       pos.add(diff);
     }
 
     vel.add(acc);
-    vel.scale(far);
+    vel.scale((far + disableFar).clamp(0.0, 1.0));
     pos.add(vel);
     edges();
 

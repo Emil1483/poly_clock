@@ -143,8 +143,7 @@ class Thunder {
     @required this.image,
     @required this.size,
   }) {
-    xOff = math.Random().nextDouble() * (size.width + image.width / 2) -
-        image.width / 2;
+    xOff = math.Random().nextDouble() * (size.width - image.width);
   }
 
   bool get dead => timer <= 0;
@@ -168,16 +167,18 @@ class Thunder {
 
 class Effects {
   static const Duration updateDelay = Duration(milliseconds: 10);
+  static const Duration thunderShakeDelay = Duration(milliseconds: 300);
 
   final List<Particle> particles = List<Particle>();
   final Size size;
+  final Function onThunder;
 
   WeatherCondition weather;
 
   double thunderTimer;
   List<Thunder> thunders = List<Thunder>();
 
-  Effects(this.size);
+  Effects(this.size, {@required this.onThunder});
 
   void addEffect(WeatherCondition condition) {
     if (weather == condition) return;
@@ -245,6 +246,7 @@ class Effects {
 
   void makeThunder() async {
     thunderTimer = math.Random().nextDouble() * 15 + 2;
+
     ByteData imageBytes = await rootBundle.load("assets/lightning.png");
     List<int> values = imageBytes.buffer.asUint8List();
     ui.Image image = await decodeImageFromList(values);
@@ -254,6 +256,9 @@ class Effects {
         size: size,
       ),
     );
+
+    await Future.delayed(thunderShakeDelay);
+    onThunder();
   }
 
   void addThunder() async {
