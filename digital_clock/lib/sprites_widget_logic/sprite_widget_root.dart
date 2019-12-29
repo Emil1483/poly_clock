@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -17,12 +18,14 @@ class SpriteWidgetRoot extends NodeWithSize {
   //TODO: change color by temperature
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
+  static const int boidsPerChar = 115;
+  static const double shakeMag = 20;
+  static const double shakeMult = 0.8;
+
   DateTime dateTime = DateTime.now();
   ClockModel clockModel;
 
   List<Boid> boids = List<Boid>();
-
-  static const int boidsPerChar = 115;
 
   QuadTree qTree;
 
@@ -30,9 +33,12 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   Effects effects;
 
+  double shake = 0;
+
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
     effects = Effects(size, onThunder: () {
+      shake = shakeMag;
       for (Boid boid in boids) {
         boid.shakeVel();
       }
@@ -120,6 +126,8 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
+    shake *= shakeMult;
+
     effects.update();
 
     qTree = QuadTree(
@@ -149,6 +157,14 @@ class SpriteWidgetRoot extends NodeWithSize {
   @override
   void paint(Canvas canvas) {
     if (boids.length == 0) return;
+    if (shake > 1) {
+      math.Random r = math.Random();
+
+      canvas.translate(
+        r.nextDouble() * shake * 2 - shake,
+        r.nextDouble() * shake * 2 - shake,
+      );
+    }
 
     effects.paint(canvas);
 
