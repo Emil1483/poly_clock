@@ -144,7 +144,7 @@ class Thunder {
     @required this.size,
   }) {
     final double width = image.width * size.height / image.height;
-    xOff = math.Random().nextDouble() * (size.width + width / 2) - width / 4;
+    xOff = math.Random().nextDouble() * size.width - width / 2;
   }
 
   bool get dead => timer <= 0;
