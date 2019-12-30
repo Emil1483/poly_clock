@@ -201,20 +201,9 @@ class SpriteWidgetRoot extends NodeWithSize {
           ? 165 + p1.colorConst * 60
           : 225 + p1.colorConst * 60;
 
-      final double greenOff = -100.0;
-      final double orangeOff = -165.0;
       double off = 0;
-      if (temperature > 28) {
-        off = orangeOff;
-      } else if (temperature > 10) {
-        off = greenOff;
-      }
+      if (temperature > 28) off = -165.0;
       hue += off;
-
-      double brightness = 0.5;
-      if (off == greenOff) {
-        brightness = (hue / 120 - 0.45).clamp(0.0, 1.0);
-      }
 
       canvas.drawPath(
           Path()
@@ -223,7 +212,7 @@ class SpriteWidgetRoot extends NodeWithSize {
             ..lineTo(p3.pos.x, p3.pos.y),
           Paint()
             ..style = PaintingStyle.fill
-            ..color = HSLColor.fromAHSL(1, hue, 1, brightness).toColor());
+            ..color = HSLColor.fromAHSL(1, hue, 1, 0.5).toColor());
     }
   }
 }
