@@ -22,6 +22,8 @@ class SpriteWidgetRoot extends NodeWithSize {
   static const double shakeMag = 20;
   static const double shakeMult = 0.8;
 
+  static const double hueSpeed = 5;
+
   DateTime dateTime = DateTime.now();
   ClockModel clockModel;
 
@@ -35,7 +37,8 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   double shake = 0;
 
-  double temperature;
+  double hueOff = 0;
+  double hueOffTarget = 0;
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
@@ -124,16 +127,14 @@ class SpriteWidgetRoot extends NodeWithSize {
     effects.addEffect(model.weatherCondition);
 
     clockModel = model;
-    temperature = model.unit == TemperatureUnit.celsius
+    final double temperature = model.unit == TemperatureUnit.celsius
         ? model.temperature
         : fahrenheitToCelsius(model.temperature);
-    //if (temperature > 28) {
-    //  hueOffTarget = -165;
-    ///} else if (temperature > 10) {
-    //  hueOffTarget = -100;
-    //} else {
-    //  hueOffTarget = 0;
-    //}
+    if (temperature > 28) {
+      hueOffTarget = -165;
+    } else {
+      hueOffTarget = 0;
+    }
   }
 
   double fahrenheitToCelsius(double f) {
@@ -142,6 +143,12 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
+    if ((hueOff - hueOffTarget).abs() > hueSpeed) {
+      hueOff -= (hueOff - hueOffTarget).sign * hueSpeed;
+    } else {
+      hueOff = hueOffTarget;
+    }
+
     shake *= shakeMult;
 
     effects.update();
@@ -202,9 +209,7 @@ class SpriteWidgetRoot extends NodeWithSize {
           ? 165 + p1.colorConst * 60
           : 225 + p1.colorConst * 60;
 
-      double off = 0;
-      if (temperature > 28) off = -165.0;
-      hue += off;
+      hue += hueOff;
 
       canvas.drawPath(
           Path()
