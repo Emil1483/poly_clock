@@ -14,6 +14,7 @@ import './delaunay.dart';
 import './effects.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
+  //TODO: add color interpelation
   //TODO: add background by theme
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
