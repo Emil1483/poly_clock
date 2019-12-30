@@ -183,11 +183,6 @@ class Boid {
   }
 
   void paint(Canvas canvas) {
-    //canvas.drawCircle(
-    //  Offset(target.x, target.y),
-    //  4,
-    //  Paint()..color = Color(0xFFFFFF00),
-    //);
     canvas.drawCircle(
       Offset(pos.x, pos.y),
       3,

@@ -82,7 +82,7 @@ class Rain extends Particle {
       ),
       Paint()
         ..color = HSLColor.fromAHSL(1, -(z - 1) * 30 + 215, 1, 0.5).toColor()
-        ..strokeWidth = 0.5 / (z * z),
+        ..strokeWidth = 1.8 / (z * z),
     );
   }
 }
@@ -235,7 +235,7 @@ class Effects {
 
   void addRain() async {
     for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < i * i * 40; j++) {
+      for (int j = 0; j < i * i * 30; j++) {
         if (weather != WeatherCondition.rainy) return;
         particles.add(
           Rain(size: size, z: i * 0.35 + 0.65),
@@ -268,7 +268,7 @@ class Effects {
   void addThunder() async {
     makeThunder();
     for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < i * i * 35; j++) {
+      for (int j = 0; j < i * i * 25; j++) {
         if (!thunder) return;
         particles.add(
           Rain(size: size, z: i * 0.35 + 0.65),
