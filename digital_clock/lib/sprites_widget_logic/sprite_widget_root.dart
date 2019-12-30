@@ -40,13 +40,13 @@ class SpriteWidgetRoot extends NodeWithSize {
   double hueOffTarget = 0;
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
-    clockModel = model;
     effects = Effects(size, onThunder: () {
       shake = shakeMag;
       for (Boid boid in boids) {
         boid.shakeVel();
       }
     });
+    updateModel(model, animation: false);
   }
 
   Future<void> initNumbers() async {
@@ -122,7 +122,7 @@ class SpriteWidgetRoot extends NodeWithSize {
     dateTime = time;
   }
 
-  void updateModel(ClockModel model) {
+  void updateModel(ClockModel model, {bool animation = true}) {
     effects.addEffect(model.weatherCondition);
 
     clockModel = model;
@@ -134,6 +134,7 @@ class SpriteWidgetRoot extends NodeWithSize {
     } else {
       hueOffTarget = 0;
     }
+    if (!animation) hueOff = hueOffTarget;
   }
 
   double fahrenheitToCelsius(double f) {
