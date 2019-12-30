@@ -14,8 +14,7 @@ import './delaunay.dart';
 import './effects.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: add effects for rain, snow and thunderstorm
-  //TODO: change color by temperature
+  //TODO: add background by theme
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   static const int boidsPerChar = 115;
@@ -34,6 +33,8 @@ class SpriteWidgetRoot extends NodeWithSize {
   Effects effects;
 
   double shake = 0;
+
+  double temperature;
 
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     clockModel = model;
@@ -118,10 +119,24 @@ class SpriteWidgetRoot extends NodeWithSize {
     dateTime = time;
   }
 
-  void updateModel(ClockModel model) async {
+  void updateModel(ClockModel model) {
     effects.addEffect(model.weatherCondition);
 
     clockModel = model;
+    temperature = model.unit == TemperatureUnit.celsius
+        ? model.temperature
+        : fahrenheitToCelsius(model.temperature);
+    //if (temperature > 28) {
+    //  hueOffTarget = -165;
+    ///} else if (temperature > 10) {
+    //  hueOffTarget = -100;
+    //} else {
+    //  hueOffTarget = 0;
+    //}
+  }
+
+  double fahrenheitToCelsius(double f) {
+    return (f - 32) / 1.8;
   }
 
   @override
@@ -176,15 +191,30 @@ class SpriteWidgetRoot extends NodeWithSize {
       final Boid p2 = boids[result[i + 1].round()];
       final Boid p3 = boids[result[i + 2].round()];
 
-      final double distThreshSq = 500; //400;
+      final double distThreshSq = 500;
 
       if (p1.pos.distanceToSquared(p2.pos) > distThreshSq) continue;
       if (p2.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
       if (p1.pos.distanceToSquared(p3.pos) > distThreshSq) continue;
 
-      final double hue = p1.colorConst > 0
+      double hue = p1.colorConst > 0
           ? 165 + p1.colorConst * 60
           : 225 + p1.colorConst * 60;
+
+      final double greenOff = -100.0;
+      final double orangeOff = -165.0;
+      double off = 0;
+      if (temperature > 28) {
+        off = orangeOff;
+      } else if (temperature > 10) {
+        off = greenOff;
+      }
+      hue += off;
+
+      double brightness = 0.5;
+      if (off == greenOff) {
+        brightness = (hue / 120 - 0.45).clamp(0.0, 1.0);
+      }
 
       canvas.drawPath(
           Path()
@@ -193,7 +223,7 @@ class SpriteWidgetRoot extends NodeWithSize {
             ..lineTo(p3.pos.x, p3.pos.y),
           Paint()
             ..style = PaintingStyle.fill
-            ..color = HSLColor.fromAHSL(1, hue, 1, 0.5).toColor());
+            ..color = HSLColor.fromAHSL(1, hue, 1, brightness).toColor());
     }
   }
 }
