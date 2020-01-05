@@ -63,8 +63,22 @@ class _DigitalClockState extends State<DigitalClock> {
   @override
   Widget build(BuildContext context) {
     return ClipRect(
-      child: SpriteWidget(
-        _rootWidget,
+      child: Stack(
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            child: Image.asset(
+              Theme.of(context).brightness == Brightness.dark
+                  ? "assets/dark_wall.png"
+                  : "assets/light_wall.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+          SpriteWidget(
+            _rootWidget,
+          ),
+        ],
       ),
     );
   }

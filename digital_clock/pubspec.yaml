@@ -23,8 +23,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - "numbers.json"
-    - "snow.png"
-    - "lightning0.png"
-    - "lightning1.png"
-    - "lightning2.png"
+    - assets/

@@ -14,7 +14,7 @@ import './delaunay.dart';
 import './effects.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: add background by theme
+  //TODO: try adding an animated wallpaper like the mkbhd intro
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   static const int boidsPerChar = 115;
