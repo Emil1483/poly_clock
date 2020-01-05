@@ -15,6 +15,7 @@ import './effects.dart';
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: try adding an animated wallpaper like the mkbhd intro
+  //TODO: maybe change snow color when in light mode
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   static const int boidsPerChar = 115;
