@@ -188,21 +188,5 @@ class Boid {
       3,
       Paint()..color = Color(0xFFFFFFFF),
     );
-    return;
-    final textStyle = ui.TextStyle(
-      color: Color(0xFF000000),
-      fontSize: 30,
-    );
-    final paragraphStyle = ui.ParagraphStyle(
-      textDirection: TextDirection.ltr,
-    );
-    final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
-      ..pushStyle(textStyle)
-      ..addText('$far');
-    final constraints = ui.ParagraphConstraints(width: 300);
-    final paragraph = paragraphBuilder.build();
-    paragraph.layout(constraints);
-    final offset = Offset(pos.x, pos.y);
-    canvas.drawParagraph(paragraph, offset);
   }
 }
