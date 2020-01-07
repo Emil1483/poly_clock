@@ -62,6 +62,7 @@ class _DigitalClockState extends State<DigitalClock> {
 
   @override
   Widget build(BuildContext context) {
+    _rootWidget.updateTheme(Theme.of(context).brightness);
     return ClipRect(
       child: Stack(
         children: <Widget>[

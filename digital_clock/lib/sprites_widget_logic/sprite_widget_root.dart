@@ -54,6 +54,10 @@ class SpriteWidgetRoot extends NodeWithSize {
     updateModel(model, animation: false);
   }
 
+  void updateTheme(Brightness brightness) {
+    wallpaper.updateTheme(brightness);
+  }
+
   Future<void> initNumbers() async {
     String jsonString = await rootBundle.loadString("assets/numbers.json");
     final List<dynamic> numbersData = json.decode(jsonString)["numbers"];

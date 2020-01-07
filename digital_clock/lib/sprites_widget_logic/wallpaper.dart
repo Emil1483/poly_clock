@@ -1,11 +1,10 @@
 import 'dart:math' as math;
-import 'package:fast_noise/fast_noise.dart' as noise;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
 class Point {
-  static const double noiseSpeed = 0.1;
-  static const double noiseDiff = 1;
+  static const double noiseSpeed = 0.07;
+  static const double noiseDiff = 0.1;
 
   final SimplexNoise noise = SimplexNoise();
   final double width;
@@ -24,43 +23,50 @@ class Point {
   void update() {
     final double noiseOff =
         noise.noise3D(center.x * noiseDiff, center.y * noiseDiff, zNoise);
-    pos = Vector2(noiseOff * width * 2 / 5 + center.x, center.y);
+    pos = Vector2(noiseOff * width * 3 / 4 + center.x, center.y);
 
     zNoise += noiseSpeed * noiseSpeed;
   }
 
-  void paint(Canvas canvas) {
+  void paint(Canvas canvas, Color color) {
     canvas.drawCircle(
       Offset(pos.x, pos.y),
-      1.2,
-      Paint()..color = Color(0xFFFFFFFF),
+      0.7,
+      Paint()..color = color,
     );
   }
 }
 
 class Wallpaper {
-  List<List<Point>> points = [];
+  final Size size;
 
-  Wallpaper(Size size) {
+  List<List<Point>> points = [];
+  Brightness theme;
+
+  Wallpaper(this.size) {
     final int cols = 10;
     final int rows = 10;
-    final double xOff = size.width / (rows * 2);
-    final double yOff = size.height / (cols * 2);
+    final double xOff = size.width / (cols * 2);
+    final double yOff = size.height / (rows * 2);
     for (int i = 0; i < rows; i++) {
       List<Point> row = [];
       for (int j = 0; j < cols; j++) {
         row.add(
           Point(
             center: Vector2(
-              j * size.width / rows + xOff,
-              i * size.height / cols + yOff,
+              j * size.width / cols + xOff,
+              i * size.height / rows + yOff,
             ),
-            width: size.width / rows,
+            width: size.width / cols,
           ),
         );
       }
       points.add(row);
     }
+  }
+
+  void updateTheme(Brightness brightness) {
+    theme = brightness;
   }
 
   void update() {
@@ -71,23 +77,52 @@ class Wallpaper {
     }
   }
 
+  List<Color> getShaderColors() {
+    if (theme == Brightness.dark) {
+      return [Color(0xFF29323D), Color(0xFF111111)];
+    } else {
+      return [Color(0xFFE2572D), Color(0xFFB74424)];
+    }
+  }
+
+  Color getPointColor() {
+    if (theme == Brightness.dark) {
+      return Color(0xFFFFFFFF);
+    } else {
+      return Color(0xFFFFFFFF);
+    }
+  }
+
   void paint(Canvas canvas) {
+    final Rect rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = LinearGradient(
+          colors: getShaderColors(),
+          transform: GradientRotation(math.pi / 2),
+        ).createShader(rect),
+    );
+
+    final Color pointColor = getPointColor();
     for (List<Point> ps in points) {
       for (Point p in ps) {
-        p.paint(canvas);
+        p.paint(canvas, pointColor);
       }
     }
-    for (List<Point> ps in points) {
-      for (int i = 0; i < ps.length - 1; i++) {
-        final Point p = ps[i];
-        final Point other = ps[i + 1];
-        final double distSq = p.pos.distanceToSquared(other.pos);
+    for (List<Point> row in points) {
+      for (int i = 0; i < row.length - 1; i++) {
+        final Point p = row[i];
+        final Point other = row[i + 1];
+        final double dist = (p.pos.x - other.pos.x).abs();
+        if (dist == 0) continue;
         canvas.drawLine(
           Offset(p.pos.x, p.pos.y),
           Offset(other.pos.x, other.pos.y),
           Paint()
-            ..color = Color(0xFFFFFFFF).withAlpha((25000 / distSq).round())
-            ..strokeWidth = 1000 / distSq,
+            ..color =
+                pointColor.withAlpha((2500 / dist).round().clamp(0, 255))
+            ..strokeWidth = (20 / dist - 0.3).clamp(0.01, 2.0),
         );
       }
     }
