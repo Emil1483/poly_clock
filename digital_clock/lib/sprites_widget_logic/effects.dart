@@ -212,8 +212,8 @@ class Effects {
     List<int> values = imageBytes.buffer.asUint8List();
     ui.Image image = await decodeImageFromList(values);
     math.Random r = math.Random();
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < i * i * 35; j++) {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < i * i * 30; j++) {
         if (weather != WeatherCondition.snowy) return;
         particles.add(
           Snow(
@@ -234,8 +234,8 @@ class Effects {
   }
 
   void addRain() async {
-    for (int i = 0; i < 4; i++) {
-      for (int j = 0; j < i * i * 30; j++) {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < i * i * 20; j++) {
         if (weather != WeatherCondition.rainy) return;
         particles.add(
           Rain(size: size, z: i * 0.35 + 0.65),
@@ -267,8 +267,8 @@ class Effects {
 
   void addThunder() async {
     makeThunder();
-    for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < i * i * 25; j++) {
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < i * i * 30; j++) {
         if (!thunder) return;
         particles.add(
           Rain(size: size, z: i * 0.35 + 0.65),

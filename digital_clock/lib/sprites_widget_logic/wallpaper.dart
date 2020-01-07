@@ -31,7 +31,7 @@ class Point {
   void paint(Canvas canvas) {
     canvas.drawCircle(
       Offset(pos.x, pos.y),
-      0.7,
+      1.3,
       Paint()..color = Color(0xFFFFFFFF),
     );
   }
@@ -44,8 +44,8 @@ class Wallpaper {
   Brightness theme;
 
   Wallpaper(this.size) {
-    final int cols = 10;
-    final int rows = 10;
+    final int cols = 6;
+    final int rows = 6;
     final double xOff = size.width / (cols * 2);
     final double yOff = size.height / (rows * 2);
     for (int i = 0; i < rows; i++) {
@@ -81,7 +81,7 @@ class Wallpaper {
     if (theme == Brightness.dark) {
       return [Color(0xFF29323D), Color(0xFF111111)];
     } else {
-      return [Color(0xFFE2572D), Color(0xFFB74424)];
+      return [Color(0xFF73D863), Color(0xFF5DAD4F)];
     }
   }
 
@@ -106,14 +106,16 @@ class Wallpaper {
         final Point p = row[i];
         final Point other = row[i + 1];
         final double dist = (p.pos.x - other.pos.x).abs();
+        final double strenght = (50 / dist - 0.5).clamp(0.01, 1.0);
         if (dist == 0) continue;
         canvas.drawLine(
           Offset(p.pos.x, p.pos.y),
           Offset(other.pos.x, other.pos.y),
           Paint()
             ..color =
-                Color(0xFFFFFF).withAlpha((2500 / dist).round().clamp(0, 255))
-            ..strokeWidth = (20 / dist - 0.3).clamp(0.01, 2.0),
+                Color(0xFFFFFF).withAlpha((strenght * 255).round())
+            ..strokeWidth = strenght * 4.5
+            ..strokeCap = StrokeCap.round,
         );
       }
     }
