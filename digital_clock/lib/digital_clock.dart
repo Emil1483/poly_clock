@@ -68,12 +68,12 @@ class _DigitalClockState extends State<DigitalClock> {
           Container(
             width: double.infinity,
             height: double.infinity,
-            child: Image.asset(
-              Theme.of(context).brightness == Brightness.dark
-                  ? "assets/dark_wall.png"
-                  : "assets/light_wall.png",
-              fit: BoxFit.cover,
-            ),
+            //child: Image.asset(
+            //  Theme.of(context).brightness == Brightness.dark
+            //      ? "assets/dark_wall.png"
+            //      : "assets/light_wall.png",
+            //  fit: BoxFit.cover,
+            //),
           ),
           SpriteWidget(
             _rootWidget,

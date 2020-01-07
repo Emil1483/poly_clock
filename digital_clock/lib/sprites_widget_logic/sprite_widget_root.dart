@@ -12,6 +12,7 @@ import './boid.dart';
 import './quad_tree.dart';
 import './delaunay.dart';
 import './effects.dart';
+import './wallpaper.dart' show Wallpaper;
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: try adding an animated wallpaper like the mkbhd intro or animated delaunay
@@ -40,6 +41,8 @@ class SpriteWidgetRoot extends NodeWithSize {
   double hueOff = 0;
   double hueOffTarget = 0;
 
+  Wallpaper wallpaper;
+
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     effects = Effects(size, onThunder: () {
       shake = shakeMag;
@@ -47,6 +50,7 @@ class SpriteWidgetRoot extends NodeWithSize {
         boid.shakeVel();
       }
     });
+    wallpaper = Wallpaper(size);
     updateModel(model, animation: false);
   }
 
@@ -144,6 +148,8 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void update(_) {
+    wallpaper.update();
+
     if ((hueOff - hueOffTarget).abs() > hueSpeed) {
       hueOff -= (hueOff - hueOffTarget).sign * hueSpeed;
     } else {
@@ -180,6 +186,8 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   @override
   void paint(Canvas canvas) {
+    wallpaper.paint(canvas);
+
     if (boids.length == 0) return;
     if (shake > 1) {
       math.Random r = math.Random();
