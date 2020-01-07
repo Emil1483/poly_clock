@@ -28,11 +28,11 @@ class Point {
     zNoise += noiseSpeed * noiseSpeed;
   }
 
-  void paint(Canvas canvas, Color color) {
+  void paint(Canvas canvas) {
     canvas.drawCircle(
       Offset(pos.x, pos.y),
       0.7,
-      Paint()..color = color,
+      Paint()..color = Color(0xFFFFFFFF),
     );
   }
 }
@@ -85,14 +85,6 @@ class Wallpaper {
     }
   }
 
-  Color getPointColor() {
-    if (theme == Brightness.dark) {
-      return Color(0xFFFFFFFF);
-    } else {
-      return Color(0xFFFFFFFF);
-    }
-  }
-
   void paint(Canvas canvas) {
     final Rect rect = Rect.fromLTWH(0, 0, size.width, size.height);
     canvas.drawRect(
@@ -104,10 +96,9 @@ class Wallpaper {
         ).createShader(rect),
     );
 
-    final Color pointColor = getPointColor();
     for (List<Point> ps in points) {
       for (Point p in ps) {
-        p.paint(canvas, pointColor);
+        p.paint(canvas);
       }
     }
     for (List<Point> row in points) {
@@ -121,7 +112,7 @@ class Wallpaper {
           Offset(other.pos.x, other.pos.y),
           Paint()
             ..color =
-                pointColor.withAlpha((2500 / dist).round().clamp(0, 255))
+                Color(0xFFFFFF).withAlpha((2500 / dist).round().clamp(0, 255))
             ..strokeWidth = (20 / dist - 0.3).clamp(0.01, 2.0),
         );
       }
