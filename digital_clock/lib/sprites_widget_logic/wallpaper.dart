@@ -40,7 +40,7 @@ class Point {
 class Wallpaper {
   final Size size;
 
-  List<List<Point>> points = [];
+  final List<List<Point>> points = [];
   Brightness theme;
 
   Wallpaper(this.size) {
