@@ -173,10 +173,9 @@ class SpriteWidgetRoot extends NodeWithSize {
     effects.update();
 
     if (allBoidsStill()) {
-      if (savedDelaunay == null)
-        savedDelaunay = triangulate(
-          boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
-        );
+      savedDelaunay ??= triangulate(
+        boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
+      );
       return;
     } else {
       savedDelaunay = null;
