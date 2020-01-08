@@ -15,7 +15,6 @@ import './effects.dart';
 import './wallpaper.dart' show Wallpaper;
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: optimize
   //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
 
   static const int boidsPerChar = 115;
