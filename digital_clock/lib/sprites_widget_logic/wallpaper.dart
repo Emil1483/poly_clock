@@ -2,30 +2,36 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart';
 
+import './delaunay.dart';
+
 class Point {
-  static const double noiseSpeed = 0.07;
-  static const double noiseDiff = 0.1;
+  static const double speed = 0.8;
+  static const double padding = 150;
 
-  final SimplexNoise noise = SimplexNoise();
-  final double width;
-  final Vector2 center;
-
+  final Size size;
   Vector2 pos;
-  double zNoise = 0;
+  Vector2 vel;
 
-  Point({
-    @required this.center,
-    @required this.width,
-  }) {
-    pos = Vector2.copy(center);
+  Point(this.size) {
+    math.Random r = math.Random();
+    pos = Vector2(
+      r.nextDouble() * (size.width + padding * 2) - padding,
+      r.nextDouble() * (size.height + padding * 2) - padding,
+    );
+    final double angle = r.nextDouble() * math.pi * 2;
+    vel = Vector2(math.cos(angle), math.sin(angle));
+  }
+
+  void edges() {
+    if (pos.x > size.width + padding) pos.x = -padding;
+    if (pos.x < -padding) pos.x = size.width + padding;
+    if (pos.y > size.height + padding) pos.y = -padding;
+    if (pos.y < -padding) pos.y = size.height + padding;
   }
 
   void update() {
-    final double noiseOff =
-        noise.noise3D(center.x * noiseDiff, center.y * noiseDiff, zNoise);
-    pos = Vector2(noiseOff * width * 3 / 4 + center.x, center.y);
-
-    zNoise += noiseSpeed * noiseSpeed;
+    pos.add(vel * speed);
+    edges();
   }
 
   void paint(Canvas canvas) {
@@ -38,30 +44,17 @@ class Point {
 }
 
 class Wallpaper {
+  static const int totalPoints = 15;
+
   final Size size;
 
-  final List<List<Point>> points = [];
+  final List<Point> points = [];
+
   Brightness theme;
 
   Wallpaper(this.size) {
-    final int cols = 6;
-    final int rows = 6;
-    final double xOff = size.width / (cols * 2);
-    final double yOff = size.height / (rows * 2);
-    for (int i = 0; i < rows; i++) {
-      List<Point> row = [];
-      for (int j = 0; j < cols; j++) {
-        row.add(
-          Point(
-            center: Vector2(
-              j * size.width / cols + xOff,
-              i * size.height / rows + yOff,
-            ),
-            width: size.width / cols,
-          ),
-        );
-      }
-      points.add(row);
+    for (int i = 0; i < totalPoints; i++) {
+      points.add(Point(size));
     }
   }
 
@@ -69,19 +62,17 @@ class Wallpaper {
     theme = brightness;
   }
 
-  void update() {
-    for (List<Point> ps in points) {
-      for (Point p in ps) {
-        p.update();
-      }
-    }
-  }
-
   List<Color> getShaderColors() {
     if (theme == Brightness.dark) {
       return [Color(0xFF29323D), Color(0xFF111111)];
     } else {
       return [Color(0xFF73D863), Color(0xFF5DAD4F)];
+    }
+  }
+
+  void update() {
+    for (Point p in points) {
+      p.update();
     }
   }
 
@@ -96,28 +87,27 @@ class Wallpaper {
         ).createShader(rect),
     );
 
-    for (List<Point> ps in points) {
-      for (Point p in ps) {
-        p.paint(canvas);
-      }
+    for (Point p in points) {
+      p.paint(canvas);
     }
-    for (List<Point> row in points) {
-      for (int i = 0; i < row.length - 1; i++) {
-        final Point p = row[i];
-        final Point other = row[i + 1];
-        final double dist = (p.pos.x - other.pos.x).abs();
-        final double strenght = (50 / dist - 0.5).clamp(0.01, 1.0);
-        if (dist == 0) continue;
-        canvas.drawLine(
-          Offset(p.pos.x, p.pos.y),
-          Offset(other.pos.x, other.pos.y),
-          Paint()
-            ..color =
-                Color(0xFFFFFF).withAlpha((strenght * 255).round())
-            ..strokeWidth = strenght * 4.5
-            ..strokeCap = StrokeCap.round,
-        );
-      }
+
+    final List<int> result = triangulate(
+      points.map((Point p) => [p.pos.x, p.pos.y]).toList(),
+    );
+    for (int i = 0; i < result.length; i += 3) {
+      final Point p1 = points[result[i].round()];
+      final Point p2 = points[result[i + 1].round()];
+      final Point p3 = points[result[i + 2].round()];
+
+      canvas.drawPath(
+        Path()
+          ..moveTo(p1.pos.x, p1.pos.y)
+          ..lineTo(p2.pos.x, p2.pos.y)
+          ..lineTo(p3.pos.x, p3.pos.y),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..color = Color(0xFFFFFFFF),
+      );
     }
   }
 }
