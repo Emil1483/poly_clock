@@ -42,6 +42,8 @@ class SpriteWidgetRoot extends NodeWithSize {
 
   Wallpaper wallpaper;
 
+  List<int> savedDelaunay;
+
   SpriteWidgetRoot({ClockModel model}) : super(const Size(500, 300)) {
     effects = Effects(size, onThunder: () {
       shake = shakeMag;
@@ -51,6 +53,14 @@ class SpriteWidgetRoot extends NodeWithSize {
     });
     wallpaper = Wallpaper(size);
     updateModel(model, animation: false);
+  }
+
+  bool allBoidsStill() {
+    if (boids.length == 0) return false;
+    for (Boid b in boids) {
+      if (!b.isStill()) return false;
+    }
+    return true;
   }
 
   void updateTheme(Brightness brightness) {
@@ -163,6 +173,16 @@ class SpriteWidgetRoot extends NodeWithSize {
 
     effects.update();
 
+    if (allBoidsStill()) {
+      if (savedDelaunay == null)
+        savedDelaunay = triangulate(
+          boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
+        );
+      return;
+    } else {
+      savedDelaunay = null;
+    }
+
     qTree = QuadTree(
       pos: Vector2(size.width / 2, size.height / 2),
       w: size.width,
@@ -175,6 +195,7 @@ class SpriteWidgetRoot extends NodeWithSize {
       );
     }
     for (Boid boid in boids) {
+      if (boid.isStill()) continue;
       List<Boid> others = queryBoids(boid.pos);
       boid.flock(others);
       boid.update();
@@ -203,9 +224,10 @@ class SpriteWidgetRoot extends NodeWithSize {
 
     effects.paint(canvas);
 
-    final List<int> result = triangulate(
-      boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
-    );
+    final List<int> result = savedDelaunay ??
+        triangulate(
+          boids.map((Boid b) => [b.pos.x, b.pos.y]).toList(),
+        );
     for (int i = 0; i < result.length; i += 3) {
       final Boid p1 = boids[result[i].round()];
       final Boid p2 = boids[result[i + 1].round()];

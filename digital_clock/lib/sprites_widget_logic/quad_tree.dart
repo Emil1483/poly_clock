@@ -17,7 +17,7 @@ class Point {
 }
 
 class QuadTree {
-  static const int maxPoints = 4;
+  static const int maxPoints = 10;
 
   List<Point> points = [];
 

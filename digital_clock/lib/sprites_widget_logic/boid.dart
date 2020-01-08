@@ -48,6 +48,12 @@ class Boid {
     colorConst = math.Random().nextDouble() * 2 - 1;
   }
 
+  bool isStill() {
+    if (pos.distanceToSquared(target) > 5) return false;
+    if (vel.length2 > 1) return false;
+    return true;
+  }
+
   void shakeVel() {
     disableFar = 1;
 
@@ -185,7 +191,7 @@ class Boid {
     canvas.drawCircle(
       Offset(pos.x, pos.y),
       3,
-      Paint()..color = Color(0xFFFFFFFF),
+      Paint()..color = isStill() ? Color(0xFFFF00FF) :  Color(0xFFFFFFFF),
     );
   }
 }
