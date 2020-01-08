@@ -12,7 +12,7 @@ import './boid.dart';
 import './quad_tree.dart';
 import './delaunay.dart';
 import './effects.dart';
-import './wallpaper2.dart' show Wallpaper;
+import './wallpaper.dart' show Wallpaper;
 
 class SpriteWidgetRoot extends NodeWithSize {
   //TODO: try adding an animated wallpaper like the mkbhd intro or animated delaunay
