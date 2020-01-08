@@ -7,7 +7,7 @@ class Boid {
   static const double observeRadius = 16;
   static const double observeRadiusSq = observeRadius * observeRadius;
 
-  static const double speed = 2.2;
+  static const double speed = 1.6;
 
   static const double alignmentForce = 0.18;
   static const double cohesionForce = 0.14;
@@ -49,7 +49,7 @@ class Boid {
   }
 
   bool isStill() {
-    if (pos.distanceToSquared(target) > 5) return false;
+    if (pos.distanceToSquared(target) > 1) return false;
     if (vel.length2 > 1) return false;
     return true;
   }
