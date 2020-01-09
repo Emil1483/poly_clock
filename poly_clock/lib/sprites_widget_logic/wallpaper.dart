@@ -5,7 +5,7 @@ import 'package:vector_math/vector_math.dart';
 import './delaunay.dart';
 
 class Point {
-  static const double speed = 0.8;
+  static const double speed = 0.4;
   static const double padding = 150;
 
   final Size size;
