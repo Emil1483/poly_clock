@@ -39,7 +39,7 @@ class ClockCustomizer extends StatefulWidget {
 
 class _ClockCustomizerState extends State<ClockCustomizer> {
   final _model = ClockModel();
-  ThemeMode _themeMode = ThemeMode.dark;
+  ThemeMode _themeMode = ThemeMode.light;
   bool _configButtonShown = false;
 
   @override
@@ -190,10 +190,7 @@ class _ClockCustomizerState extends State<ClockCustomizer> {
 
     return MaterialApp(
       theme: ThemeData.light(),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        canvasColor: Color(0xFF29323D),
-      ),
+      darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
       debugShowCheckedModeBanner: false,
       home: Scaffold(
