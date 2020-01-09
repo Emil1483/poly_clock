@@ -9,12 +9,12 @@ import 'package:flutter_clock_helper/model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'digital_clock.dart';
+import 'poly_clock.dart';
 
 void main() {
   if (!kIsWeb && Platform.isMacOS) {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
 
-  runApp(ClockCustomizer((ClockModel model) => DigitalClock(model)));
+  runApp(ClockCustomizer((ClockModel model) => PolyClock(model)));
 }

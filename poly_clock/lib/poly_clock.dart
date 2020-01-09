@@ -6,16 +6,16 @@ import 'package:spritewidget/spritewidget.dart';
 
 import './sprites_widget_logic/sprite_widget_root.dart';
 
-class DigitalClock extends StatefulWidget {
-  const DigitalClock(this.model);
+class PolyClock extends StatefulWidget {
+  const PolyClock(this.model);
 
   final ClockModel model;
 
   @override
-  _DigitalClockState createState() => _DigitalClockState();
+  _PolyClockState createState() => _PolyClockState();
 }
 
-class _DigitalClockState extends State<DigitalClock> {
+class _PolyClockState extends State<PolyClock> {
   Timer _timer;
   SpriteWidgetRoot _rootWidget;
 
@@ -29,7 +29,7 @@ class _DigitalClockState extends State<DigitalClock> {
   }
 
   @override
-  void didUpdateWidget(DigitalClock oldWidget) {
+  void didUpdateWidget(PolyClock oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.model != oldWidget.model) {
       oldWidget.model.removeListener(_updateModel);
