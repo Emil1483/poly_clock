@@ -15,8 +15,6 @@ import './effects.dart';
 import './wallpaper.dart' show Wallpaper;
 
 class SpriteWidgetRoot extends NodeWithSize {
-  //TODO: add notice for apache licence https://www.apache.org/licenses/LICENSE-2.0
-
   static const int boidsPerChar = 115;
   static const double shakeMag = 20;
   static const double shakeMult = 0.8;
